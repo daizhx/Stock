@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+<!-- 
+	<com.viewpagerindicator.TabPageIndicator
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@color/main1"
+	    android:id="@+id/page_ind"/>
+	<android.support.v4.view.ViewPager
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_below="@id/page_ind"
+	    android:id="@+id/viewpager"/>
+	     -->
+    <!--
+	<include layout="@layout/layout_title"/>
+	-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+    >
+	<RelativeLayout android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:padding="4dp"
+	    android:id="@+id/subscription_hint"
+	    android:visibility="gone"
+	    >
+	    <Button android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/subscription"
+	        android:layout_alignParentRight="true"
+	        android:id="@+id/btn_subscription"
+	        android:background="@drawable/button_bg"
+	        android:layout_centerVertical="true"/>
+	    <TextView android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_toLeftOf="@id/btn_subscription"
+	        android:text="每日金股在每个交易日九点半之前更新开放给订阅服务的用户"
+	        android:layout_marginLeft="10dp"
+	        android:layout_centerVertical="true"/>
+	</RelativeLayout>
+	<com.hengxuan.stock.widget.PullToRefreshPinnedSectionListView
+	    xmlns:ptr="http://schemas.android.com/apk/res-auto"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+        android:layout_below="@id/subscription_hint"
+	    android:id="@+id/pull_to_refresh_list"></com.hengxuan.stock.widget.PullToRefreshPinnedSectionListView>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@android:id/hint"
+        android:text="@string/no_data"
+        android:textSize="24sp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@android:id/hint"
+        android:layout_centerHorizontal="true"
+        android:text="@string/reconnect"
+        android:background="@drawable/button_bg"
+        android:visibility="gone"
+        android:id="@android:id/button1"/>
+</RelativeLayout>
+</LinearLayout>

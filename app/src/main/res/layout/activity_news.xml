@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg"
+    android:paddingTop="@dimen/list_vertical_margin"
+    android:paddingLeft="@dimen/list_horizontal_margin"
+    android:paddingRight="@dimen/list_horizontal_margin"
+    >
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="false"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:id="@+id/title"
+            />
+        <RelativeLayout android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/widget_margin">
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7f7f7f34"
+                android:text="06-11 15:13"
+                android:id="@+id/time"/>
+            <TextView android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#7f7f7f34"
+                android:layout_alignParentRight="true"
+                android:id="@+id/author"/>
+            <View android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/divider_color"
+                android:layout_alignParentBottom="true"
+                android:layout_below="@id/time"
+                android:layout_marginTop="@dimen/widget_margin"/>
+        </RelativeLayout>
+        
+        <TextView android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/content"
+            android:textColor="#4e4e4e"
+            android:textSize="16sp"
+            />
+    </LinearLayout>
+</ScrollView>

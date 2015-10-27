@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android"
+    android:oneshot="true">
+    <item android:drawable="@drawable/i_0001" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0002" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0003" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0004" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0005" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0006" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0007" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0008" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0009" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0010" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0011" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0012" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0013" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0014" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0015" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0016" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0017" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0018" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0019" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0020" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0021" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0022" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0023" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@drawable/i_0024" android:duration="@integer/animation_list_duration"/>
+    <item android:drawable="@android:color/transparent" android:duration="@integer/animation_list_duration"/>
+</animation-list>

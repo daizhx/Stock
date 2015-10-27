@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+	<ImageView android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="2dp"
+	    android:src="@drawable/ic_action_cancel"
+	    android:layout_marginTop="20dp"
+	    android:layout_marginLeft="20dp"
+	    android:id="@+id/iv_cancel"/>
+	
+	<EditText android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="50dp"
+	    android:layout_marginLeft="50dp"
+	    android:layout_marginRight="50dp"
+	    android:hint="@string/input_user_name"
+	    android:id="@+id/user"/>
+	
+	<EditText android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="30dp"
+	    android:layout_marginLeft="50dp"
+	    android:layout_marginRight="50dp"
+	    android:hint="@string/tel"
+	    android:id="@+id/tel"/>
+	
+	<EditText android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="30dp"
+	    android:layout_marginLeft="50dp"
+	    android:layout_marginRight="50dp"
+	    android:hint="@string/input_pw"
+	    android:inputType="textPassword"
+	    android:id="@+id/pw"/>
+	
+	<EditText android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="30dp"
+	    android:layout_marginLeft="50dp"
+	    android:layout_marginRight="50dp"
+	    android:hint="@string/confirm_pw"
+	    android:inputType="textPassword"
+	    android:id="@+id/pw2"/>
+	
+	<Button android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_marginTop="30dp"
+	    android:layout_marginLeft="50dp"
+	    android:layout_marginRight="50dp"
+	    android:text="@string/register"
+	    android:id="@+id/btn_reg"/>
+	
+</LinearLayout>
+

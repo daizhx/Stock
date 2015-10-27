@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bg">
+
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@android:color/white"
+        android:layout_marginTop="20dp">
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stocks_day"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:id="@+id/title0"/>
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title0"
+            android:id="@+id/menu0"/>
+        
+        <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buy"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/menu0"
+            android:background="@drawable/listitem_bg"/>
+	</RelativeLayout>
+        
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@android:color/white"
+        android:layout_marginTop="20dp">
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/stocks_month2"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:id="@+id/title1"/>
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title1"
+            android:id="@+id/menu1"/>
+        
+        <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buy"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/menu1"
+            android:background="@drawable/listitem_bg"/>
+    </RelativeLayout>
+    
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:background="@android:color/white"
+        android:layout_marginTop="20dp">
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/jg_stocks"
+            android:textStyle="bold"
+            android:textAppearance="@android:style/TextAppearance.Medium"
+            android:id="@+id/title2"/>
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/title2"
+            android:id="@+id/menu2"/>
+        
+        <Button android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/buy"
+            android:layout_alignParentRight="true"
+            android:layout_below="@id/menu2"
+            android:background="@drawable/listitem_bg"/>
+    </RelativeLayout>
+    
+</LinearLayout>

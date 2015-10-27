@@ -1,0 +1,61 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="#E5E6E5">
+
+    <RadioGroup android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/navigation_tabs_vertical_margin"
+        android:paddingBottom="@dimen/navigation_tabs_vertical_margin"
+        android:orientation="horizontal"
+        android:layout_alignParentBottom="true"
+        android:id="@+id/tabs"
+        android:background="@color/main2"
+        >
+        <RadioButton android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:text="@string/home"
+            android:textColor="@color/tab_text_color"
+            android:drawableTop="@drawable/ic_menu_home"
+            android:id="@+id/home"/>
+        
+        <RadioButton android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:text="@string/select_stocks"
+            android:textColor="@color/tab_text_color"
+            android:drawableTop="@drawable/ic_news_selector"
+            android:id="@+id/select"/>
+        <RadioButton android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:text="@string/profit"
+            android:textColor="@color/tab_text_color"
+            android:drawableTop="@drawable/ic_stocks_selector"
+            android:id="@+id/stocks"/>
+        <RadioButton android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:button="@null"
+            android:text="@string/member"
+            android:textColor="@color/tab_text_color"
+            android:drawableTop="@drawable/ic_member_selector"
+            android:id="@+id/member"/>
+    </RadioGroup>
+
+    <FrameLayout android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/container"
+        android:layout_above="@id/tabs"
+        ></FrameLayout>
+</RelativeLayout>
