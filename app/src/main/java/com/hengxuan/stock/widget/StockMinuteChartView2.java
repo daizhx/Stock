@@ -300,19 +300,6 @@ public class StockMinuteChartView2 extends SurfaceView implements SurfaceHolder.
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.StockMinutChartView, defStyle, 0);
-
-        mExampleColor = a.getColor(
-                R.styleable.StockMinutChartView_exampleColor,
-                mExampleColor);
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        mExampleDimension = a.getDimension(
-                R.styleable.StockMinutChartView_exampleDimension,
-                mExampleDimension);
-
-        a.recycle();
 
         // Set up a default TextPaint object
         mTextPaint = new TextPaint();

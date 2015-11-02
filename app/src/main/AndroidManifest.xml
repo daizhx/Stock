@@ -204,7 +204,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".Activity.TestActivity" >
-
         </activity>
         <activity
             android:name=".Activity.ZXGEditActivity"

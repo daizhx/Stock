@@ -2,32 +2,52 @@ package com.hengxuan.stock.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
+import android.view.ViewConfiguration;
+import android.widget.TextView;
 
 import com.hengxuan.stock.R;
+import com.hengxuan.stock.application.Constants;
+import com.hengxuan.stock.data.SignPoint;
+import com.hengxuan.stock.utils.Log;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.zip.CheckedOutputStream;
 
 /**
  * TODO: document your custom view class.
  */
-public class StockMinutChartView extends View {
-    private String mExampleString; // TODO: use a default from R.string...
+public class StockMinutChartView extends View{
     private int mExampleColor = Color.RED; // TODO: use a default from R.color...
     private float mExampleDimension = 0; // TODO: use a default from R.dimen...
-    private Drawable mExampleDrawable;
 
+    private SurfaceHolder mHolder;
     private TextPaint mTextPaint;
     private float mTextWidth;
     private float mTextHeight;
     private float mTextBottom;
     private String mText;
 
+    private ArrayList rawDataList;
     private float[][] data;
     private float widthUnit;
     private float heightUnit;
@@ -35,48 +55,229 @@ public class StockMinutChartView extends View {
     private float yHighValue;
     private float yLowValue;
     private float ratio;
-    private static final int TIME = 240;
+    private static final int TIME = 240 + 1;
     private Path mPath;
     private Paint mPaint;
 
-    private double[] testData = new double[]{20.80,21.00,20.80,20.61,21.00,21.20,21.06,21.10,21.13,21.11,
-            21.05,21.10,21.03,21.00,21.10,21.00,20.93,20.68,20.93,20.81,20.92,20.81,20.85,20.80,20.79,20.75,20.79,20.90,20.94
-            ,20.94,20.93,20.95,21.01,21.13,21.28,21.40,21.26,21.32,21.40,21.41,21.32,21.40,21.37,21.44,21.48,21.58,21.58,21.40,21.39,
-            21.47,21.56,21.55,21.57,21.42,21.38,21.35,21.47,21.50,21.48,21.37,21.45,21.40,21.47,21.50,21.59,21.60,21.60,21.57,21.55,21.55,
-            21.54,21.55,21.67,21.70,21.71,21.71,21.70,21.59,21.40,21.50,21.60,21.65,21.50,21.39,21.40,21.45,21.51,21.48,21.40,21.40,21.37,21.40,21.38,
-            21.48,21.50,21.40,21.40,21.34,21.30,21.32,21.31,21.35,21.30,21.30,21.15,21.03,21.02,21.08,21.11,21.14,21.05,21.00,21.00,20.90,20.85,20.90,20.99,
-            21.00,21.15,21.18,21.18,21.35,21.35,21.21,21.34,21.20,21.19,21.10,21.03,21.08,21.20,21.20,21.10,21.10,21.05,21.00,21.05,21.10,21.15,21.12,21.11,21.10,
-            21.10,21.10,21.06,21.02,21.04,21.06,21.10,21.07,21.10,21.09,21.17,21.07,21.02,20.92,20.92,20.98,21.01,21.03,21.00,21.00,20.99,20.92,20.90,20.94,20.99,21.00,
-            21.04,21.06,21.10,21.20,21.33,21.36,21.30,21.26,21.25,21.22,21.25,21.50,21.50,21.61,21.67,21.53,21.47,21.50,21.60,21.70,21.76,21.81,21.90,21.85,21.65,21.79,21.87,
-            21.96,22.01,22.20,22.10,22.01,22.19,22.45,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50
-            ,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50};
+    private boolean isShowInterSection = false;
+    private float xPoint;
+    private float yPoint;
+    private GestureDetector gestureDetector;
+    private Context context;
+    private int textSize = 24;
+//    private int width;
+//    private int height;
+//
+//    private int contentWidth;
+//    private int contentHeight;
+//    private int contentLeft;
+//    private int contentTop;
+//    private int contentRight;
+//    private int contentBottom;
 
-    public void setUpData(double base,double[] prices){
-        yBaseValue = (float) base;
-        yHighValue = findMaxValue(prices);
-        yLowValue = yBaseValue - (yHighValue - yBaseValue);
-        ratio = ((yHighValue - yBaseValue)/yBaseValue)*100;
-        int w = getWidth();
-        int h = getHeight();
-        widthUnit = (float)w/TIME;
-        heightUnit = (float)h/(yHighValue - yLowValue);
-        data = new float[prices.length][2];
-        for(int i=0;i<prices.length;i++){
-            data[i][0] = (float) (i*widthUnit);
-            data[i][1] = (float) ((yHighValue - prices[i])*heightUnit);
-        }
+    private SignPoint[] signBSPoints;
+
+    public void setSignBSPoints(SignPoint[] c){
+        signBSPoints = c;
     }
 
-    private float findMaxValue(double[] prices){
+    private int redraw_type = -1;
+    private static final int TOUCH_REDRAW = 0;
+    private static final int DATA_UPDATE_REDRAW = 1;
+
+    private Bitmap dataChart;
+
+
+    public void setData(float base,ArrayList arrayList){
+        yBaseValue = base;
+        rawDataList = arrayList;
+    }
+    public void setDataAndRefresh(float base,ArrayList arrayList){
+        yBaseValue = base;
+        rawDataList = arrayList;
+        redraw_type = DATA_UPDATE_REDRAW;
+        invalidate();
+    }
+
+    private float calcuRange(ArrayList prices){
         float ret = 0;
-        for(int i=0;i<prices.length;i++){
-            float f = (float) Math.abs(prices[i]);
+        for(int i=0;i<prices.size();i++){
+            float f = Math.abs((float)prices.get(i) - yBaseValue);
             if(f > ret){
                 ret = f;
             }
         }
         return ret;
     }
+
+    private float calcuRange(double[] prices){
+        float ret = 0;
+        for(int i=0;i<prices.length;i++){
+            float f = (float) Math.abs(prices[i] - yBaseValue);
+            if(f > ret){
+                ret = f;
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        int paddingLeft = getPaddingLeft();
+        int paddingTop = getPaddingTop();
+        int paddingRight = getPaddingRight();
+        int paddingBottom = getPaddingBottom();
+
+        int contentWidth = getWidth() - paddingLeft - paddingRight;
+        int contentHeight = getHeight() - paddingTop - paddingBottom;
+
+        if(dataChart == null || redraw_type == DATA_UPDATE_REDRAW){
+            dataChart = createDataChart(contentWidth,contentHeight);
+        }
+        canvas.drawBitmap(dataChart,paddingLeft,paddingTop,mPaint);
+
+        if(redraw_type == TOUCH_REDRAW && isShowInterSection){
+//            canvas.drawColor(Color.TRANSPARENT);
+//            mPaint.setColor(Color.RED);
+            mPaint.setStyle(Paint.Style.STROKE);
+            mPaint.setStrokeWidth(1);
+            canvas.drawLine(xPoint, paddingTop, xPoint, paddingTop+contentHeight, mPaint);
+            canvas.drawLine(paddingLeft, yPoint, paddingLeft+contentWidth, yPoint, mPaint);
+            TextView textview = (TextView) LayoutInflater.from(context).inflate(R.layout.minute_chart_label_text,null);
+            textview.setDrawingCacheEnabled(true);
+            textview.setText(String.valueOf(yHighValue - (yPoint-paddingTop) / heightUnit));
+            textview.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+            int w = textview.getMeasuredWidth();
+            int h = textview.getMeasuredHeight();
+            textview.layout(0, 0, w, h);
+            Bitmap bitmap = textview.getDrawingCache();
+            if(xPoint > contentWidth/2){
+                canvas.drawBitmap(bitmap,0,yPoint - h/2,mPaint);
+            }else {
+                canvas.drawBitmap(bitmap, contentWidth - w, yPoint - h / 2, mPaint);
+            }
+
+        }
+
+        if(signBSPoints != null && signBSPoints.length > 0){
+            for(int i=0;i<signBSPoints.length;i++){
+                SignPoint signBSPoint = signBSPoints[i];
+                int hour = signBSPoint.hour;
+                int minute = signBSPoint.minut;
+                int xStep =0;
+                if((9 == hour && minute >= 30) || 10 == hour || (11 == hour && minute <= 30)) {
+                    xStep = (hour - 9) * 60 + minute - 30;
+                }
+                if(13 <= hour && hour <= 15){
+                    xStep = 120 + (hour - 13)*60 + minute + 1;//+1是让13点从11:30的位置偏移一个步长开始
+                }
+                int id = signBSPoint.getSignId();
+                Bitmap bitmap = null;
+                if(id == SignPoint.BUY) {
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.buy);
+                }else if(id == SignPoint.SELL){
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sell);
+                }
+                float x = xStep*widthUnit;
+                float y = data[xStep][1];
+                if(bitmap != null) {
+                    canvas.drawBitmap(bitmap,x,y,mPaint);
+                }
+            }
+        }
+        redraw_type = -1;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int w = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
+        int h = getDefaultSize(getSuggestedMinimumHeight(),heightMeasureSpec);
+        TextView textview = (TextView) LayoutInflater.from(context).inflate(R.layout.minute_chart_label_text,null);
+        Log.d(String.valueOf(yHighValue - yPoint / heightUnit));
+        textview.setText(String.valueOf(yHighValue - yPoint / heightUnit));
+        textview.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        int h2 = textview.getMeasuredHeight();
+        setMeasuredDimension(w, h+h2);
+//        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        super.onLayout(changed, left, top, right, bottom);
+    }
+
+
+    public Bitmap createDataChart(int w,int h){
+        Bitmap bitmap= Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        //draw bg or else is black
+        canvas.drawColor(Color.WHITE);
+        //draw grid
+        mPaint.setColor(Color.GRAY);
+        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStrokeWidth(1);
+        canvas.drawRect(0, 0, w, h, mPaint);
+        for(int i=1;i<4;i++){
+            float y = (h/4f)*i;
+            float x = (w/4f)*i;
+            canvas.drawLine(0,y,w,y,mPaint);
+            canvas.drawLine(x,0,x,h,mPaint);
+        }
+
+        //setup data
+        if(rawDataList != null) {
+            float range = calcuRange(rawDataList);
+            yHighValue = range + yBaseValue;
+            yLowValue = yBaseValue - range;
+            ratio = ((yHighValue - yBaseValue) / yBaseValue) * 100;
+            widthUnit = (float) w / TIME;
+            heightUnit = (float) h / (yHighValue - yLowValue);
+            data = new float[rawDataList.size()][2];
+            for (int i = 0; i < rawDataList.size(); i++) {
+                data[i][0] = (float) (i * widthUnit);
+                data[i][1] = (float) ((yHighValue - (float) rawDataList.get(i)) * heightUnit);
+            }
+        }
+
+        //draw number text
+        mText = String.format("%.2f",yHighValue);
+        invalidateTextPaintAndMeasurements(Color.RED);
+        canvas.drawText(mText, 0, mTextHeight, mTextPaint);
+
+        mText = String.format("%.2f",ratio)+"%";
+        invalidateTextPaintAndMeasurements();
+        canvas.drawText(mText, w - mTextWidth, mTextHeight, mTextPaint);
+
+        mText = String.format("%.2f",yBaseValue);
+        invalidateTextPaintAndMeasurements(Color.GRAY);
+        canvas.drawText(mText, 0, (h + mTextHeight) / 2 - mTextBottom, mTextPaint);
+
+        mText = String.format("%.2f",yLowValue);
+        invalidateTextPaintAndMeasurements(Color.GREEN);
+        canvas.drawText(mText, 0, h - mTextBottom, mTextPaint);
+
+        mText = String.format("%.2f",ratio)+"%";
+        invalidateTextPaintAndMeasurements();
+        canvas.drawText(mText, w - mTextWidth, h - mTextBottom, mTextPaint);
+
+        //draw the minute line
+        mPaint.setColor(Color.BLACK);
+        mPaint.setStrokeWidth(2);
+        mPaint.setAntiAlias(true);
+
+
+        if (data != null && data.length >= 1) {
+            mPath.moveTo(data[0][0], data[0][1]);
+            for (int i = 1; i < data.length; i++) {
+//                mPath.lineTo(data[i][0], data[i][1]);
+                mPath.quadTo(data[i - 1][0], data[i - 1][1], data[i][0], data[i][1]);
+            }
+            canvas.drawPath(mPath, mPaint);
+        }
+        return bitmap;
+    }
+
 
     public StockMinutChartView(Context context) {
         super(context);
@@ -85,6 +286,7 @@ public class StockMinutChartView extends View {
 
     public StockMinutChartView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
         init(attrs, 0);
     }
 
@@ -95,39 +297,22 @@ public class StockMinutChartView extends View {
 
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.StockMinutChartView, defStyle, 0);
-
-        mExampleString = a.getString(
-                R.styleable.StockMinutChartView_exampleString);
-        mExampleColor = a.getColor(
-                R.styleable.StockMinutChartView_exampleColor,
-                mExampleColor);
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        mExampleDimension = a.getDimension(
-                R.styleable.StockMinutChartView_exampleDimension,
-                mExampleDimension);
-
-        if (a.hasValue(R.styleable.StockMinutChartView_exampleDrawable)) {
-            mExampleDrawable = a.getDrawable(
-                    R.styleable.StockMinutChartView_exampleDrawable);
-            mExampleDrawable.setCallback(this);
-        }
-
-        a.recycle();
 
         // Set up a default TextPaint object
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.LEFT);
 
-        // Update TextPaint and text measurements from attributes
-        invalidateTextPaintAndMeasurements();
-
         mPath = new Path();
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+
+        // Update TextPaint and text measurements from attributes
+        invalidateTextPaintAndMeasurements();
+
+
+        gestureDetector = new GestureDetector(context,new MyGestureListener());
     }
 
     private void invalidateTextPaintAndMeasurements() {
@@ -144,173 +329,85 @@ public class StockMinutChartView extends View {
 
     private void invalidateTextPaintAndMeasurements(int color,float size) {
         mTextPaint.setTextSize(size);
-        invalidateTextPaintAndMeasurements(color);
-    }
-
-    private void invalidateTextPaintAndMeasurements(int color){
         mTextPaint.setColor(color);
         invalidateTextPaintAndMeasurements();
     }
 
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//        mWidth = getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec);
-//        mHeight = getDefaultSize(getSuggestedMinimumHeight(),heightMeasureSpec);
-//        setMeasuredDimension(mWidth,mHeight);
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    private void invalidateTextPaintAndMeasurements(int color){
+        invalidateTextPaintAndMeasurements(color,textSize);
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
 
-        // TODO: consider storing these as member variables to reduce
-        // allocations per draw cycle.
-//        int paddingLeft = getPaddingLeft();
-//        int paddingTop = getPaddingTop();
-//        int paddingRight = getPaddingRight();
-//        int paddingBottom = getPaddingBottom();
-//
-//        int contentWidth = getWidth() - paddingLeft - paddingRight;
-//        int contentHeight = getHeight() - paddingTop - paddingBottom;
+    public void drawBSSign(int hour,int minute){
 
-        // Draw the text.
-//        canvas.drawText(mExampleString,
-//                paddingLeft + (contentWidth - mTextWidth) / 2,
-//                paddingTop + (contentHeight + mTextHeight) / 2,
-//                mTextPaint);
+    }
 
-        // Draw the example drawable on top of the text.
-//        if (mExampleDrawable != null) {
-//            mExampleDrawable.setBounds(paddingLeft, paddingTop,
-//                    paddingLeft + contentWidth, paddingTop + contentHeight);
-//            mExampleDrawable.draw(canvas);
-//        }
 
-        int width = getWidth();
-        int height = getHeight();
-        //draw grid
-        for(int i=1;i<4;i++){
-            float y = (height/4f)*i;
-            float x = (width/4f)*i;
-            canvas.drawLine(0,y,width,y,mPaint);
-            canvas.drawLine(x,0,x,height,mPaint);
-        }
-
-        setUpData(20.45, testData);//test code
-
-        //draw number text
-        mText = String.format("%.2f",yHighValue);
-        invalidateTextPaintAndMeasurements(Color.RED);
-        canvas.drawText(mText, 0, mTextHeight, mTextPaint);
-
-        mText = String.format("%.2f",ratio)+"%";
-        invalidateTextPaintAndMeasurements();
-        canvas.drawText(mText, width - mTextWidth, mTextHeight, mTextPaint);
-
-        mText = String.format("%.2f",yBaseValue);
-        invalidateTextPaintAndMeasurements(Color.GRAY);
-        canvas.drawText(mText, 0, (height + mTextHeight) / 2 - mTextBottom, mTextPaint);
-
-        mText = String.format("%.2f",yLowValue);
-        invalidateTextPaintAndMeasurements(Color.GREEN);
-        canvas.drawText(mText, 0, height - mTextBottom, mTextPaint);
-
-        mText = String.format("%.2f",ratio)+"%";
-        invalidateTextPaintAndMeasurements();
-        canvas.drawText(mText, width - mTextWidth,height - mTextBottom,mTextPaint);
-
-        //draw the minute line
-        if(data.length >= 1) {
-            mPath.moveTo(data[0][0], data[0][1]);
-            for (int i = 1; i < data.length; i++) {
-                mPath.lineTo(data[i][0], data[i][1]);
+    /**
+     * show every minut point value
+     * x is the touching x point
+     */
+    public void showInterSection(boolean show,float x) {
+        Log.d("show intersection:"+show+",x="+x);
+        if(show && rawDataList != null) {
+            int num = (int) (x / widthUnit);
+            if(num < data.length) {
+                xPoint = data[num][0];
+                yPoint = data[num][1];
             }
-            canvas.drawPath(mPath, mPaint);
+        }
+        isShowInterSection = show;
+        redraw_type = TOUCH_REDRAW;
+        invalidate();
+    }
+
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int id = event.getPointerId(0);
+        float x = 0,y;
+        switch (event.getAction()){
+            case MotionEvent.ACTION_DOWN:
+                x = event.getX(id);
+                showInterSection(true,x);
+            case MotionEvent.ACTION_MOVE:
+                x = event.getX(id);
+                Log.d("x="+x);
+                if(x > getWidth() || x <0){
+                    return false;
+                }
+                if(Math.abs(x - xPoint) >= widthUnit){
+                    showInterSection(true,x);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                showInterSection(false,0);
+                break;
+            case MotionEvent.ACTION_OUTSIDE:
+                Log.d("out side...");
+                showInterSection(false,0);
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                Log.d("action cancel");
+                showInterSection(false,0);
+                break;
+            default:
+                break;
+        }
+        return true;
+    }
+
+    class MyGestureListener extends GestureDetector.SimpleOnGestureListener{
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if(distanceX >= widthUnit){
+                int id = e2.getPointerId(0);
+                float x = e2.getX();
+                Log.d("onScroll...");
+                showInterSection(true,x);
+            }
+            return true;
         }
 
-    }
-
-    public void fun(){
-
-    }
-
-    /**
-     * Gets the example string attribute value.
-     *
-     * @return The example string attribute value.
-     */
-    public String getExampleString() {
-        return mExampleString;
-    }
-
-    /**
-     * Sets the view's example string attribute value. In the example view, this string
-     * is the text to draw.
-     *
-     * @param exampleString The example string attribute value to use.
-     */
-    public void setExampleString(String exampleString) {
-        mExampleString = exampleString;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * Gets the example color attribute value.
-     *
-     * @return The example color attribute value.
-     */
-    public int getExampleColor() {
-        return mExampleColor;
-    }
-
-    /**
-     * Sets the view's example color attribute value. In the example view, this color
-     * is the font color.
-     *
-     * @param exampleColor The example color attribute value to use.
-     */
-    public void setExampleColor(int exampleColor) {
-        mExampleColor = exampleColor;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * Gets the example dimension attribute value.
-     *
-     * @return The example dimension attribute value.
-     */
-    public float getExampleDimension() {
-        return mExampleDimension;
-    }
-
-    /**
-     * Sets the view's example dimension attribute value. In the example view, this dimension
-     * is the font size.
-     *
-     * @param exampleDimension The example dimension attribute value to use.
-     */
-    public void setExampleDimension(float exampleDimension) {
-        mExampleDimension = exampleDimension;
-        invalidateTextPaintAndMeasurements();
-    }
-
-    /**
-     * Gets the example drawable attribute value.
-     *
-     * @return The example drawable attribute value.
-     */
-    public Drawable getExampleDrawable() {
-        return mExampleDrawable;
-    }
-
-    /**
-     * Sets the view's example drawable attribute value. In the example view, this drawable is
-     * drawn above the text.
-     *
-     * @param exampleDrawable The example drawable attribute value to use.
-     */
-    public void setExampleDrawable(Drawable exampleDrawable) {
-        mExampleDrawable = exampleDrawable;
     }
 }

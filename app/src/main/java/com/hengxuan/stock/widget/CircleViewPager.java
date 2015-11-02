@@ -41,17 +41,23 @@ public class CircleViewPager extends FrameLayout implements OnPageChangeListener
 	private static final int WHEEL_STOP = 101;
 	private Handler mHandler;
 
+    int[] index = new int[]{0,1,2,1,0};
+    int p = 0;
 	public void next(){
-		int position = (currentPage + 1) % pageCount;
-		if(position == pageCount){
-			mViewPager.setCurrentItem(1,true);
-		}else{
-			mViewPager.setCurrentItem(position,true);
-		}
+        p++;
+        p = p % index.length;
+        mViewPager.setCurrentItem(index[p]);
+
+//		int position = (currentPage + 1) % pageCount;
+//		if(position == pageCount){
+//			mViewPager.setCurrentItem(1,true);
+//		}else{
+//			mViewPager.setCurrentItem(position,true);
+//		}
 	}
 	
 	public void startCircle(){
-		mHandler.sendEmptyMessageDelayed(WHEEL, 3000);
+		mHandler.sendEmptyMessageDelayed(WHEEL, 5000);
 	}
 	
 	public void stopCircle(){

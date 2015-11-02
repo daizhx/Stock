@@ -110,11 +110,13 @@ public class ZXGFragment extends Fragment {
                     AnimationDrawable animationDrawable = (AnimationDrawable) ivDataRefreshInd.getDrawable();
                     animationDrawable.stop();
                     animationDrawable.start();
-                    Log.i("msg update data");
                     refreshZxgDataList();
-                    Message msg1 = Message.obtain();
-                    msg1.what = MSG_DATA_UPDATE;
-                    mHandler.sendMessageDelayed(msg1,UPDATE_DURATION);
+                    if(getView().isShown()) {
+                        Log.i("msg update data");
+                        Message msg1 = Message.obtain();
+                        msg1.what = MSG_DATA_UPDATE;
+                        mHandler.sendMessageDelayed(msg1, UPDATE_DURATION);
+                    }
                     break;
                 default:
                     break;
@@ -478,9 +480,12 @@ public class ZXGFragment extends Fragment {
     public void onResume() {
         super.onResume();
         if(mHandler != null) {
-            Message msg = Message.obtain();
-            msg.what = MSG_DATA_UPDATE;
-            mHandler.sendMessageDelayed(msg, UPDATE_DURATION);
+            if(getView().isShown()) {
+                Log.d("===========================");
+                Message msg = Message.obtain();
+                msg.what = MSG_DATA_UPDATE;
+                mHandler.sendMessageDelayed(msg, UPDATE_DURATION);
+            }
         }
     }
 

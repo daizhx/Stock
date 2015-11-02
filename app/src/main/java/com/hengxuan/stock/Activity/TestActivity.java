@@ -6,6 +6,9 @@ import android.os.PersistableBundle;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.ScrollView;
 
 import com.hengxuan.stock.R;
 import com.hengxuan.stock.utils.Log;
@@ -16,23 +19,14 @@ import com.hengxuan.stock.widget.StockMinuteChartView2;
  */
 public class TestActivity extends Activity {
 
-    StockMinuteChartView2 stockMinuteChartView2;
-    private double[] testData = new double[]{20.80,21.00,20.80,20.61,21.00,21.20,21.06,21.10,21.13,21.11,
-            21.05,21.10,21.03,21.00,21.10,21.00,20.93,20.68,20.93,20.81,20.92,20.81,20.85,20.80,20.79,20.75,20.79,20.90,20.94
-            ,20.94,20.93,20.95,21.01,21.13,21.28,21.40,21.26,21.32,21.40,21.41,21.32,21.40,21.37,21.44,21.48,21.58,21.58,21.40,21.39,
-            21.47,21.56,21.55,21.57,21.42,21.38,21.35,21.47,21.50,21.48,21.37,21.45,21.40,21.47,21.50,21.59,21.60,21.60,21.57,21.55,21.55,
-            21.54,21.55,21.67,21.70,21.71,21.71,21.70,21.59,21.40,21.50,21.60,21.65,21.50,21.39,21.40,21.45,21.51,21.48,21.40,21.40,21.37,21.40,21.38,
-            21.48,21.50,21.40,21.40,21.34,21.30,21.32,21.31,21.35,21.30,21.30,21.15,21.03,21.02,21.08,21.11,21.14,21.05,21.00,21.00,20.90,20.85,20.90,20.99,
-            21.00,21.15,21.18,21.18,21.35,21.35,21.21,21.34,21.20,21.19,21.10,21.03,21.08,21.20,21.20,21.10,21.10,21.05,21.00,21.05,21.10,21.15,21.12,21.11,21.10,
-            21.10,21.10,21.06,21.02,21.04,21.06,21.10,21.07,21.10,21.09,21.17,21.07,21.02,20.92,20.92,20.98,21.01,21.03,21.00,21.00,20.99,20.92,20.90,20.94,20.99,21.00,
-            21.04,21.06,21.10,21.20,21.33,21.36,21.30,21.26,21.25,21.22,21.25,21.50,21.50,21.61,21.67,21.53,21.47,21.50,21.60,21.70,21.76,21.81,21.90,21.85,21.65,21.79,21.87,
-            21.96,22.01,22.20,22.10,22.01,22.19,22.45,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50
-            ,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50,22.50};
+    String[] ss = new String[]{"aaa","bbb","ccc","ddd","aaa","bbb","ccc","ddd","aaa","bbb","ccc","ddd","aaa","bbb","ccc","ddd","aaa","bbb","ccc","ddd","aaa","bbb","ccc","ddd","aaa","bbb","ccc","ddd"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.sample_stock_minute_chart_view2);
-        stockMinuteChartView2 = (StockMinuteChartView2) findViewById(R.id.minut_view);
+        setContentView(R.layout.activity_test);
+        ListView listView = (ListView) findViewById(android.R.id.list);
+        listView.setAdapter(new ArrayAdapter(this, android.R.layout.simple_list_item_1, android.R.id.text1, ss));
 //        stockMinuteChartView2.setUpData(20.45,testData);
+        ScrollView scrollView;
     }
 }

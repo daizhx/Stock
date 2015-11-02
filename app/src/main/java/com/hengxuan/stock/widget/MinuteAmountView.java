@@ -2,6 +2,7 @@ package com.hengxuan.stock.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -23,16 +24,12 @@ import java.util.ArrayList;
 /**
  * TODO: document your custom view class.
  */
-public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callback {
+public class MinuteAmountView extends DataChartView{
 
     private TextPaint mTextPaint;
     private float[] priceArray;
     private int[] volumnArray;
     private Paint drawPaint;
-    private int width;
-    private int height;
-    private int contentWidth;
-    private int contentHeight;
     private Context context;
     private SurfaceHolder surfaceHolder;
     private static final int TIME = 240 + 1;
@@ -52,8 +49,7 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
         this.closePrice = closePrice;
         priceArray = prices;
         volumnArray = volumn;
-
-        new DrawThread().start();
+        invalidate();
     }
 
     public void setDataAndInvalidate(float closePrice,ArrayList prices,ArrayList volumn){
@@ -73,8 +69,7 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
                 volumnArray[i] = (int) volumn.get(i) - (int)volumn.get(i-1);
             }
         }
-
-        new DrawThread().start();
+        invalidate();
     }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -87,7 +82,7 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
             case MotionEvent.ACTION_MOVE:
                 x = event.getX(id);
                 Log.d("x="+x);
-                if(x > width || x <0){
+                if(x > getWidth() || x <0){
                     return false;
                 }
                 if(Math.abs(x - xPoint) >= wunit){
@@ -115,6 +110,7 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
             xPoint = x;
             invalidate();
         }
+        redraw_type = TOUCH_REDRAW;
     }
 
     private int getMaxValue(){
@@ -151,30 +147,21 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
     private void init(AttributeSet attrs, int defStyle) {
         // Load attributes
 
-
         // Set up a default TextPaint object
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.LEFT);
 
         drawPaint = new Paint();
-        drawPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        drawPaint.setColor(Color.BLACK);
-        drawPaint.setStyle(Paint.Style.STROKE);
-        drawPaint.setStrokeWidth(2);
         // Update TextPaint and text measurements from attributes
         invalidateTextPaintAndMeasurements();
-        surfaceHolder = getHolder();
-        surfaceHolder.addCallback(this);
+
     }
 
     private void invalidateTextPaintAndMeasurements() {
 
     }
 
-    private void invalidateDrawPaint(){
-
-    }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -184,11 +171,7 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
         textview.setText("0");
         textview.measure(MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED), MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
         int h2 = textview.getMeasuredHeight();
-        width = w;
-        height = h + h2;
-        setMeasuredDimension(width, height);
-        contentWidth = width;
-        contentHeight = height - h2;
+        setMeasuredDimension(w, h+h2);
 //        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
@@ -196,95 +179,83 @@ public class MinuteAmountView extends SurfaceView implements SurfaceHolder.Callb
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        // TODO: consider storing these as member variables to reduce
-        // allocations per draw cycle.
         int paddingLeft = getPaddingLeft();
         int paddingTop = getPaddingTop();
         int paddingRight = getPaddingRight();
         int paddingBottom = getPaddingBottom();
 
-        if(isShowLabelLine){
-            drawPaint.setStyle(Paint.Style.STROKE);
-            drawPaint.setStrokeWidth(2);
-            drawPaint.setColor(Color.BLACK);
-            canvas.drawLine(xPoint,0,xPoint,contentHeight,drawPaint);
+        int contentWidth = getWidth() - paddingLeft - paddingRight;
+        int contentHeight = getHeight() - paddingTop - paddingBottom;
+
+        if(redraw_type == TOUCH_REDRAW){
+            canvas.drawBitmap(dataChart, paddingLeft, paddingTop, drawPaint);
+            if(isShowLabelLine){
+                drawPaint.setStyle(Paint.Style.STROKE);
+                drawPaint.setStrokeWidth(2);
+                drawPaint.setColor(Color.BLACK);
+                canvas.drawLine(xPoint, 0, xPoint, contentHeight, drawPaint);
+                redraw_type = -1;
+            }
+        }else {
+            dataChart = createDataChart(contentWidth,contentHeight);
+            canvas.drawBitmap(dataChart, paddingLeft, paddingTop, drawPaint);
         }
 
     }
 
-    private void doDraw(){
+    private Bitmap createDataChart(int w,int h){
+        Bitmap bitmap = Bitmap.createBitmap(w,h, Bitmap.Config.RGB_565);
+        Canvas canvas = new Canvas(bitmap);
+        canvas.drawColor(Color.WHITE);
+        drawPaint.setColor(Color.BLACK);
+        drawPaint.setStyle(Paint.Style.STROKE);
+        drawPaint.setStrokeWidth(1);
+        drawPaint.setAntiAlias(true);
+        canvas.drawRect(0, 0, w, h, drawPaint);
+        drawPaint.setColor(Color.GRAY);
+        canvas.drawLine(0, (float) h / 2, w, (float) h / 2, drawPaint);
+        canvas.drawLine((float) w / 4, 0, (float) w / 4, h, drawPaint);
+        canvas.drawLine((float) w * 2 / 4, 0, (float) w * 2 / 4, h, drawPaint);
+        canvas.drawLine((float) w * 3 / 4, 0, (float) w * 3 / 4, h, drawPaint);
 
-    }
+        int max = getMaxValue();
 
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        new DrawThread().start();
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-
-    }
-
-    private class DrawThread extends Thread{
-        @Override
-        public void run() {
-            synchronized (MinuteAmountView.this){
-                Canvas canvas = surfaceHolder.lockCanvas();
-                canvas.drawColor(Color.WHITE);
-                drawPaint.setColor(Color.BLACK);
-                canvas.drawRect(0, 0, contentWidth - 1, contentHeight, drawPaint);
+        wunit = (float) w / TIME;
+        if (max != 0) {
+            hunit = (float) h / max;
+        }
+        drawPaint.setStrokeWidth(wunit);
+        if (priceArray != null) {
+            if (priceArray[0] > closePrice) {
+                drawPaint.setColor(Color.RED);
+            } else if (priceArray[0] < closePrice) {
+                drawPaint.setColor(Color.GREEN);
+            } else {
                 drawPaint.setColor(Color.GRAY);
-                canvas.drawLine(0, (float) contentHeight / 2, contentWidth, (float) contentHeight / 2, drawPaint);
-                canvas.drawLine((float) contentWidth / 4, 0, (float) contentWidth / 4, contentHeight, drawPaint);
-                canvas.drawLine((float) contentWidth * 2 / 4, 0, (float) contentWidth * 2 / 4, contentHeight, drawPaint);
-                canvas.drawLine((float) contentWidth * 3 / 4, 0, (float) contentWidth * 3 / 4, contentHeight, drawPaint);
-
-                int max = getMaxValue();
-
-                wunit = (float) contentWidth / TIME;
-                if (max != 0) {
-                    hunit = (float) contentHeight / max;
-                }
-                drawPaint.setStrokeWidth(wunit);
-                if (priceArray != null) {
-                    if (priceArray[0] > closePrice) {
+            }
+//                    canvas.drawLine(0 * wunit, -contentHeight, 0 * wunit, volumnArray[0] * hunit, drawPaint);
+            for (int i = 0; i < volumnArray.length; i++) {
+                if (i == 0) {
+                    if (priceArray[i] > closePrice) {
                         drawPaint.setColor(Color.RED);
-                    } else if (priceArray[0] < closePrice) {
+                    } else if (priceArray[i] < closePrice) {
                         drawPaint.setColor(Color.GREEN);
                     } else {
                         drawPaint.setColor(Color.GRAY);
                     }
-//                    canvas.drawLine(0 * wunit, -contentHeight, 0 * wunit, volumnArray[0] * hunit, drawPaint);
-                    for (int i = 0; i < volumnArray.length; i++) {
-                        if (i == 0) {
-                            if (priceArray[i] > closePrice) {
-                                drawPaint.setColor(Color.RED);
-                            } else if (priceArray[i] < closePrice) {
-                                drawPaint.setColor(Color.GREEN);
-                            } else {
-                                drawPaint.setColor(Color.GRAY);
-                            }
-                        } else {
-                            if (priceArray[i] > priceArray[i - 1]) {
-                                drawPaint.setColor(Color.RED);
-                            } else if (priceArray[i] < priceArray[i - 1]) {
-                                drawPaint.setColor(Color.GREEN);
-                            } else {
-                                drawPaint.setColor(Color.GRAY);
-                            }
-                        }
-
-                        canvas.drawLine(i * wunit, contentHeight, i * wunit, contentHeight - volumnArray[i] * hunit, drawPaint);
+                } else {
+                    if (priceArray[i] > priceArray[i - 1]) {
+                        drawPaint.setColor(Color.RED);
+                    } else if (priceArray[i] < priceArray[i - 1]) {
+                        drawPaint.setColor(Color.GREEN);
+                    } else {
+                        drawPaint.setColor(Color.GRAY);
                     }
                 }
-                surfaceHolder.unlockCanvasAndPost(canvas);
+
+                canvas.drawLine(i * wunit+1, h-1, i * wunit, h - volumnArray[i] * hunit, drawPaint);
             }
         }
+        return bitmap;
     }
 }

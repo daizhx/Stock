@@ -66,7 +66,6 @@ import com.hengxuan.stock.utils.Log;
 
 public class NewsListFragment extends Fragment{
 	private NewsListAdapter mAdapter;
-	LinkedList<News> listNews = new LinkedList<News>();
 	private int listMargin = 8;
 	private int listItemMargin = 16;//*density for pixel
 	private ImageView headImage;
@@ -95,7 +94,7 @@ public class NewsListFragment extends Fragment{
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_news, null, false);
 		mPullToRefreshListView = (PullToRefreshListView) root.findViewById(R.id.pull_refresh_list);
-		mAdapter = new NewsListAdapter(getActivity(),listNews);
+		mAdapter = new NewsListAdapter(getActivity());
 		mPullToRefreshListView.setAdapter(mAdapter);
 		LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
 		ColorDrawable c = new ColorDrawable(getResources().getColor(R.color.divider_color));
@@ -109,13 +108,13 @@ public class NewsListFragment extends Fragment{
 		mPullToRefreshListView.getRefreshableView().setVerticalScrollBarEnabled(false);
 //		loadHeadImage();
 
-        getData(0,false);
+        mAdapter.getDataViaHttp(0, false);
         mPullToRefreshListView.setOnItemClickListener(new OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
                                     long arg3) {
-                News news = listNews.get(arg2-1);
+                News news = mAdapter.getData(arg2 - 1);
                 Intent intent = new Intent(getActivity(),NewsActivity.class);
                 intent.putExtra("articleId", news.articleId);
                 intent.putExtra("date", news.date);
@@ -130,14 +129,14 @@ public class NewsListFragment extends Fragment{
             public void onPullDownToRefresh(
                     PullToRefreshBase<ListView> refreshView) {
                 // TODO Auto-generated method stub
-                getData(0, false);
+                mAdapter.getDataViaHttp(0, false);
             }
 
             @Override
             public void onPullUpToRefresh(
                     PullToRefreshBase<ListView> refreshView) {
                 page++;
-                getData(page, true);
+                mAdapter.getDataViaHttp(page, true);
             }
 
 
@@ -156,48 +155,5 @@ public class NewsListFragment extends Fragment{
 //		ImageLoader.getInstance().displayImage("assets://place_holder.png", headImage, options);
 //		
 //	}
-	
-	//pageÒ³Âë
-	private void getData(int page,final boolean append){
-        Log.d("get news data");
-        final HttpUtils httpUtils = HttpUtils.getInstance(getActivity());
-        String d = (String) DateFormat.format("yyyy-MM-dd", System.currentTimeMillis());
-        String url = HttpAPI.GET_ARTICLE + "/"+page+"/0/"+d;
-        jsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                JSONObject data = (JSONObject) httpUtils.parseData(response);
-				if(data !=null){
-					JSONArray news = httpUtils.getNewsList(data);
-                    Log.d("get news:"+news);
-					//Ë¢ÐÂÊý¾Ý
-					if(!append){
-						listNews.clear();
-					}
-					for(int i=0;i<news.length();i++){
-						JSONObject msg = null;
-						try {
-							msg = (JSONObject) news.get(i);
-							News n = new News();
-							n.title = msg.getString("title");
-							n.date = msg.getString("createOn");
-							n.articleId = msg.getString("stockArticleId");
-							listNews.add(n);
-						} catch (JSONException e1) {
-							e1.printStackTrace();
-						}
-					}
-				}
-				mAdapter.notifyDataSetChanged();
-				mPullToRefreshListView.onRefreshComplete();
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.d("get news list fail..."+error.getLocalizedMessage());
-				mPullToRefreshListView.onRefreshComplete();
-            }
-        });
-        httpUtils.addToRequestQueue(jsonObjectRequest);
-	}
+
 }

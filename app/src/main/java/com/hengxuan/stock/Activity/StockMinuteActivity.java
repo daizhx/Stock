@@ -27,6 +27,7 @@ import com.hengxuan.stock.user.User;
 import com.hengxuan.stock.utils.Log;
 import com.hengxuan.stock.utils.StockFormula;
 import com.hengxuan.stock.widget.MinuteAmountView;
+import com.hengxuan.stock.widget.StockMinutChartView;
 import com.hengxuan.stock.widget.StockMinuteChartView2;
 
 import org.json.JSONArray;
@@ -60,7 +61,7 @@ public class StockMinuteActivity extends Activity {
     private  TextView tvPrice2;
     private  TextView tvIncreasePercentage2;
 
-    private StockMinuteChartView2 minuteChartView;
+    private StockMinutChartView minuteChartView;
     private MinuteAmountView minuteAmountView;
 
     private static final int DATA1_UPDATE = 1;
@@ -200,7 +201,7 @@ public class StockMinuteActivity extends Activity {
         tvPrice2 = (TextView) findViewById(R.id.average_price);
         tvIncreasePercentage2 = (TextView) findViewById(R.id.tv_zf);
 
-        minuteChartView = (StockMinuteChartView2) findViewById(R.id.minute_chart);
+        minuteChartView = (StockMinutChartView) findViewById(R.id.minute_chart);
         minuteAmountView = (MinuteAmountView) findViewById(R.id.amount_chart);
         myThread = new MyThread(this,code);
         myThread.start();

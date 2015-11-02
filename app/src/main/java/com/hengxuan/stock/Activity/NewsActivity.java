@@ -22,9 +22,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.format.DateFormat;
+import android.view.MenuItem;
 import android.widget.TextView;
 
-public class NewsActivity extends SubActivity {
+public class NewsActivity extends Activity {
 	private String articleId;
 	private String newsDate;
 	private TextView content;
@@ -76,5 +77,14 @@ public class NewsActivity extends SubActivity {
             }
         });
         httpUtils.addToRequestQueue(jsonObjectRequest);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if(id == android.R.id.home){
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

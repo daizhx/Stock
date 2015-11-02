@@ -4,7 +4,13 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.zip.Inflater;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.hengxuan.stock.http.HttpAPI;
+import com.hengxuan.stock.http.HttpUtils;
+import com.hengxuan.stock.http.MyJsonObjectRequest;
 import com.hengxuan.stock.model.News;
+import com.hengxuan.stock.utils.Log;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -22,18 +28,18 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class NewsListAdapter extends BaseAdapter{
 	private Context mContext;
-	LinkedList<News> mListNews;//双向列表
+	private LinkedList<News> mListNews = new LinkedList<>();//data from web
 	
-	public NewsListAdapter(Context c, LinkedList<News> l){
+	public NewsListAdapter(Context c){
 		mContext = c;
-		mListNews = l;
 	}
-	
-	public void setData(LinkedList<News> list){
-		mListNews = list;
-	}
+
 	@Override
 	public int getCount() {
 		if(mListNews == null){
@@ -122,5 +128,52 @@ public class NewsListAdapter extends BaseAdapter{
 		TextView text;
 		TextView author;
 	}
+
+    public void getDataViaHttp(int page,final boolean append){
+        Log.d("get news data");
+        final HttpUtils httpUtils = HttpUtils.getInstance(mContext);
+        String d = (String) DateFormat.format("yyyy-MM-dd", System.currentTimeMillis());
+        String url = HttpAPI.GET_ARTICLE + "/"+page+"/0/"+d;
+        MyJsonObjectRequest jsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONObject data = (JSONObject) httpUtils.parseData(response);
+                if(data !=null){
+                    JSONArray news = httpUtils.getNewsList(data);
+                    Log.d("get news:"+news);
+                    //刷新数据
+                    if(!append){
+                        mListNews.clear();
+                    }
+                    for(int i=0;i<news.length();i++){
+                        JSONObject msg = null;
+                        try {
+                            msg = (JSONObject) news.get(i);
+                            News n = new News();
+                            n.title = msg.getString("title");
+                            n.date = msg.getString("createOn");
+                            n.articleId = msg.getString("stockArticleId");
+                            mListNews.add(n);
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+                notifyDataSetChanged();
+//                mPullToRefreshListView.onRefreshComplete();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("get news list fail..."+error.getLocalizedMessage());
+//                mPullToRefreshListView.onRefreshComplete();
+            }
+        });
+        httpUtils.addToRequestQueue(jsonObjectRequest);
+    }
+
+    public News getData(int position){
+        return mListNews.get(position);
+    }
 
 }

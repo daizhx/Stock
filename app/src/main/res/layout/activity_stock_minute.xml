@@ -126,12 +126,14 @@
             android:textColor="@android:color/holo_red_dark"
             android:id="@+id/tv_zf"/>
     </LinearLayout>
-    <com.hengxuan.stock.widget.StockMinuteChartView2
+    <com.hengxuan.stock.widget.StockMinutChartView
         android:background="@android:color/transparent"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="240dp"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:id="@+id/minute_chart"/>
 
     <LinearLayout

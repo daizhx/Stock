@@ -1,56 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
-              android:layout_width="match_parent"
-    android:layout_height="match_parent"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@color/bg">
     <include layout="@layout/layout_title"/>
-	<com.hengxuan.stock.widget.CircleViewPager android:layout_width="match_parent"
-	    android:layout_height="200dp"
-	    android:id="@+id/circleviewpager"></com.hengxuan.stock.widget.CircleViewPager>
-	
-	<LinearLayout android:layout_width="match_parent"
-	    android:layout_height="wrap_content"
-	    android:background="@android:color/white"
-	    android:orientation="horizontal"
-	    android:padding="@dimen/widget_margin">
-	    
-	    <TextView android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-	        android:text="@string/stocks_month"
-	        android:drawableTop="@drawable/home_menu1"
-	        android:drawablePadding="@dimen/icon_menu_padding"
-	        android:gravity="center"
-	        android:id="@+id/menu1"/>
-	    <TextView android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_weight="1"
-	        android:text="@string/jg_stocks"
-	        android:drawableTop="@drawable/home_menu2"
-	        android:drawablePadding="@dimen/icon_menu_padding"
-	        android:gravity="center"
-	        android:id="@+id/menu2"/>
-        <!--
-	    <TextView android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:gravity="center"
-	        android:layout_weight="1"
-	        android:text="@string/sjkh"
-	        android:drawableTop="@drawable/home_menu3"
-	        android:drawablePadding="@dimen/icon_menu_padding"
-	        android:id="@+id/menu3"/>
-	        -->
-        <TextView android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_weight="1"
-                  android:text="@string/mncp"
-                  android:drawableTop="@drawable/home_menu4"
-                  android:drawablePadding="@dimen/icon_menu_padding"
-                  android:gravity="center"
-                  android:id="@+id/menu3"/>
-	</LinearLayout>
+
+    <com.hengxuan.stock.widget.PullToRefreshPinnedHeaderListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@android:id/list">
+    </com.hengxuan.stock.widget.PullToRefreshPinnedHeaderListView>
+
+
 	<!--
 	<LinearLayout android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
@@ -112,6 +76,7 @@
 	        android:id="@+id/cp_list"></ListView>
 	</LinearLayout>
 	-->
+    <!--
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -124,12 +89,15 @@
         android:id="@+id/tv_dpgd"
         android:paddingTop="4dp"
         android:paddingBottom="4dp"/>
+        -->
+    <!--
     <fragment
         android:name="com.hengxuan.stock.fragment.NewsListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:layout="@layout/fragment_news"
         android:id="@+id/news_fragment"/>
+        -->
     <!--
 <LinearLayout
     android:layout_width="match_parent"
@@ -264,4 +232,10 @@
     </LinearLayout>
 </LinearLayout>
 -->
+    <!--
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@android:id/list"></ListView>
+        -->
 </LinearLayout>
