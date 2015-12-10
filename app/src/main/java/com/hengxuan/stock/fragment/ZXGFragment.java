@@ -107,15 +107,17 @@ public class ZXGFragment extends Fragment {
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case MSG_DATA_UPDATE:
-                    AnimationDrawable animationDrawable = (AnimationDrawable) ivDataRefreshInd.getDrawable();
-                    animationDrawable.stop();
-                    animationDrawable.start();
-                    refreshZxgDataList();
-                    if(getView().isShown()) {
-                        Log.i("msg update data");
-                        Message msg1 = Message.obtain();
-                        msg1.what = MSG_DATA_UPDATE;
-                        mHandler.sendMessageDelayed(msg1, UPDATE_DURATION);
+                    if(StockFormula.isOpenTime()) {
+                        AnimationDrawable animationDrawable = (AnimationDrawable) ivDataRefreshInd.getDrawable();
+                        animationDrawable.stop();
+                        animationDrawable.start();
+                        refreshZxgDataList();
+                        if (getView().isShown()) {
+                            Log.i("msg update zxg data");
+                            Message msg1 = Message.obtain();
+                            msg1.what = MSG_DATA_UPDATE;
+                            mHandler.sendMessageDelayed(msg1, UPDATE_DURATION);
+                        }
                     }
                     break;
                 default:

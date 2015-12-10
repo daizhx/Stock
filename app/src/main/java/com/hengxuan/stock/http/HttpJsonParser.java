@@ -34,8 +34,7 @@ public class HttpJsonParser {
 
     public Object getObject(){
         try {
-            String code = (String) response.get("object");
-            return code;
+            return  response.get("object");
         } catch (JSONException e) {
             e.printStackTrace();
             return null;

@@ -8,6 +8,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.hb.views.PinnedHeaderListView;
 import com.hb.views.SectionedBaseAdapter;
+import com.hengxuan.pulltorefresh.PullToRefreshBase;
 import com.hengxuan.stock.Activity.AnalystsActivity;
 import com.hengxuan.stock.Activity.DpgdActivity;
 import com.hengxuan.stock.Activity.NewsActivity;
@@ -74,10 +75,10 @@ public class HomeFragment extends Fragment {
     PullToRefreshPinnedHeaderListView pullToRefreshPinneHeaderListView;
 
     private DataListAdapter adapter;
+    private LinkedList dataList = new LinkedList();
 
     private class DataListAdapter extends SectionedBaseAdapter{
 
-        private LinkedList dataList = new LinkedList();
         private Context mContext;
         public DataListAdapter(Context context){
             mContext = context;
@@ -183,52 +184,54 @@ public class HomeFragment extends Fragment {
             return layout;
         }
 
-        public void getDataViaHttp(int page,final boolean append){
-            Log.d("get news data");
-            final HttpUtils httpUtils = HttpUtils.getInstance(mContext);
-            String d = (String) DateFormat.format("yyyy-MM-dd", System.currentTimeMillis());
-            String url = HttpAPI.GET_ARTICLE + "/"+page+"/0/"+d;
-            MyJsonObjectRequest jsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    JSONObject data = (JSONObject) httpUtils.parseData(response);
-                    if(data !=null){
-                        JSONArray news = httpUtils.getNewsList(data);
-                        Log.d("get news:"+news);
-                        //刷新数据
-                        if(!append){
-                            dataList.clear();
-                        }
-                        for(int i=0;i<news.length();i++){
-                            JSONObject msg = null;
-                            try {
-                                msg = (JSONObject) news.get(i);
-                                News n = new News();
-                                n.title = msg.getString("title");
-                                n.date = msg.getString("createOn");
-                                n.articleId = msg.getString("stockArticleId");
-                                dataList.add(n);
-                            } catch (JSONException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-                    }
-                    notifyDataSetChanged();
-//                mPullToRefreshListView.onRefreshComplete();
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("get news list fail..."+error.getLocalizedMessage());
-//                mPullToRefreshListView.onRefreshComplete();
-                }
-            });
-            httpUtils.addToRequestQueue(jsonObjectRequest);
-        }
+
 
         public News getData(int position){
             return (News) dataList.get(position);
         }
+    }
+
+    public void getDataViaHttp(int page,final boolean append){
+        Log.d("get news data");
+        final HttpUtils httpUtils = HttpUtils.getInstance(getActivity());
+        String d = (String) DateFormat.format("yyyy-MM-dd", System.currentTimeMillis());
+        String url = HttpAPI.GET_ARTICLE + "/"+page+"/0/"+d;
+        MyJsonObjectRequest jsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONObject data = (JSONObject) httpUtils.parseData(response);
+                if(data !=null){
+                    JSONArray news = httpUtils.getNewsList(data);
+                    Log.d("get news:"+news);
+                    //刷新数据
+                    if(!append){
+                        dataList.clear();
+                    }
+                    for(int i=0;i<news.length();i++){
+                        JSONObject msg = null;
+                        try {
+                            msg = (JSONObject) news.get(i);
+                            News n = new News();
+                            n.title = msg.getString("title");
+                            n.date = msg.getString("createOn");
+                            n.articleId = msg.getString("stockArticleId");
+                            dataList.add(n);
+                        } catch (JSONException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+                adapter.notifyDataSetChanged();
+                pullToRefreshPinneHeaderListView.onRefreshComplete();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("get news list fail..."+error.getLocalizedMessage());
+                pullToRefreshPinneHeaderListView.onRefreshComplete();
+            }
+        });
+        httpUtils.addToRequestQueue(jsonObjectRequest);
     }
 	
 	@Override
@@ -245,7 +248,19 @@ public class HomeFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View root = inflater.inflate(R.layout.fragment_home, null, false);
         pullToRefreshPinneHeaderListView = (PullToRefreshPinnedHeaderListView) root.findViewById(android.R.id.list);
+        pullToRefreshPinneHeaderListView.setOnRefreshListener(new PullToRefreshBase.OnRefreshListener2<ListView>() {
+            @Override
+            public void onPullDownToRefresh(PullToRefreshBase<ListView> refreshView) {
+                getDataViaHttp(0, false);
+            }
+
+            @Override
+            public void onPullUpToRefresh(PullToRefreshBase<ListView> refreshView) {
+
+            }
+        });
         mListView = pullToRefreshPinneHeaderListView.getRefreshableView();
+        mListView.setHeaderDividersEnabled(false);
         View headerView = View.inflate(getActivity(), R.layout.home_list_head, null);
         mListView.addHeaderView(headerView);
 
@@ -264,7 +279,6 @@ public class HomeFragment extends Fragment {
 			
 			@Override
 			public void onClick(View v) {
-                Toast.makeText(getActivity(),"暂未开放",Toast.LENGTH_SHORT).show();
 				startActivity(new Intent(getActivity(),JgmrActivity.class));
 			}
 		});
@@ -293,10 +307,11 @@ public class HomeFragment extends Fragment {
 //            }
 //        });
 //        mListView = (ListView) root.findViewById(android.R.id.list);
-        mListView.setOnItemClickListener(new PinnedHeaderListView.OnItemClickListener() {
+        ((PinnedHeaderListView)mListView).setOnItemClickListener(new PinnedHeaderListView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int section, int position, long id) {
-                Log.d("item="+position+",section="+section);
+                if(position == 1)return;
+
                 News news = adapter.getData(position - 2);
                 Intent intent = new Intent(getActivity(),NewsActivity.class);
                 intent.putExtra("articleId", news.articleId);
@@ -310,7 +325,7 @@ public class HomeFragment extends Fragment {
             }
         });
         adapter = new DataListAdapter(getActivity());
-        adapter.getDataViaHttp(0,false);
+        getDataViaHttp(0,false);
         mListView.setAdapter(adapter);
 		return root;
 	}
@@ -318,7 +333,9 @@ public class HomeFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        mCircleViewPager.startCircle();
+        if(mCircleViewPager != null) {
+            mCircleViewPager.startCircle();
+        }
     }
 
     @Override

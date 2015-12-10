@@ -18,7 +18,7 @@ public final class DataContract {
             + ")";
     public static final String SQL_DELETE_NEW_ENTRYS = "DROP TABLE IF EXISTS " + NewsTable.TABLE_NAME;
 
-    public static final String SQL_CREATE_CP_ENTRYS = "CREATE TABLE " + CpMsgEntry.TABLE_NAME + " (" + CpMsgEntry._ID + " INTEGER PRIMARY KEY,"
+    public static final String SQL_CREATE_CP_ENTRYS = "CREATE TABLE " + CpMsgEntry.TABLE_NAME + " (" + CpMsgEntry._ID + " INTEGER AUTO_INCREMENT PRIMARY KEY,"
             + CpMsgEntry.COLUMN_NAME + " TEXT,"
             + CpMsgEntry.COLUMN_TIME + " DATETIME NOT NULL,"
             + CpMsgEntry.COLUMN_CONTENT + " TEXT NOT NULL"

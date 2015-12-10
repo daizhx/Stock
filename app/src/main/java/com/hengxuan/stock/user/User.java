@@ -56,8 +56,10 @@ public class User {
 
     public String getId(){
         if(id==null){
-            SharedPreferences sp = context.getSharedPreferences("user", Context.MODE_PRIVATE);
-            id = sp.getString("id", null);
+//            SharedPreferences sp = context.getSharedPreferences("user", Context.MODE_PRIVATE);
+//            id = sp.getString("id", null);
+            SharedPreferences sp = context.getSharedPreferences("settings", Context.MODE_PRIVATE);
+            id = sp.getString("user_id",null);
         }
         return id;
     }

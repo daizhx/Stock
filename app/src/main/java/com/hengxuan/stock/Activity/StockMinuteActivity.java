@@ -141,6 +141,8 @@ public class StockMinuteActivity extends Activity {
                         data1[6] = data[34];
 //                        Message msg = handler.obtainMessage(DATA_UPDATE);
                         handler.sendEmptyMessage(DATA1_UPDATE);
+                        //get bs point after get data
+                        getBSSign(code);
                     }
 
                 }
@@ -206,7 +208,6 @@ public class StockMinuteActivity extends Activity {
         myThread = new MyThread(this,code);
         myThread.start();
 
-        getBSSign(code);
     }
 
 
@@ -249,8 +250,8 @@ public class StockMinuteActivity extends Activity {
         if(code == null || code.isEmpty())return;
         HttpUtils httpUtils = HttpUtils.getInstance(this);
         User user = User.getUser(this);
-        String username = user.getName();
-        String url = HttpAPI.GET_BS_SIGN + "/" + username + "/" + code;
+        String id = user.getId();
+        String url = HttpAPI.GET_BS_SIGN + "/" + id + "/" + code;
         MyJsonObjectRequest myJsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
@@ -263,8 +264,9 @@ public class StockMinuteActivity extends Activity {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-
+                Log.d("---------------");
             }
         });
+        httpUtils.addToRequestQueue(myJsonObjectRequest);
     }
 }

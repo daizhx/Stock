@@ -58,6 +58,7 @@
 	<string name="register">注册</string>
 	<string name="subscription">订阅</string>
 	<string name="subscription_center">订阅中心</string>
+    <string name="buy_vip">购买VIP</string>
 	<string name="not_access_server">网络请求失败</string>
 	<string name="not_access_server2">网络请求失败，下拉涮新重试</string>
 	<string name="reconnect">重试</string>
@@ -128,4 +129,5 @@
     <string name="week_profit">本周收益</string>
     <string name="month_profit">本月收益</string>
     <string name="profit">收益</string>
+    <string name="vip_detail">解锁星标*隐藏的内容，优先获得实时推送，获取B,S信号</string>
 </resources>

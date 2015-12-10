@@ -119,8 +119,10 @@ public class SettingsFragment extends Fragment {
                 // TODO Auto-generated method stub
                 switch (arg2) {
                     case 0:
-                        Toast.makeText(getActivity(),R.string.not_use,Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity(),R.string.not_use,Toast.LENGTH_SHORT).show();
 //                        startActivity(new Intent(getActivity(), SubscriptionActivity.class));
+                        ChargeDialogFragment chargeDialogFragment = new ChargeDialogFragment();
+                        chargeDialogFragment.show(getFragmentManager(),"dialog");
                         break;
                     case 1:
                         Toast.makeText(getActivity(),R.string.newest_version,Toast.LENGTH_SHORT).show();
@@ -137,8 +139,9 @@ public class SettingsFragment extends Fragment {
         });
         if(user.isLogin()){
             btn.setVisibility(View.VISIBLE);
-        }else{
             userName.setText(user.getName());
+        }else{
+            btn.setVisibility(View.INVISIBLE);
         }
         mTVUserId = (TextView) root.findViewById(R.id.user_id);
         mTVUserId.setText("ID: "+userId);
@@ -158,7 +161,7 @@ public class SettingsFragment extends Fragment {
      */
     private void setData(){
         HashMap<String, String> m = new HashMap<String, String>();
-        m.put(keys[0], getString(R.string.subscription_center));
+        m.put(keys[0], getString(R.string.buy_vip));
         list.add(m);
         m = new HashMap<String, String>();
         m.put(keys[0], getString(R.string.update));
@@ -177,8 +180,7 @@ public class SettingsFragment extends Fragment {
         m.put(keys[0], getString(R.string.log_out));
         list.add(m);
 
-        SharedPreferences sp = getActivity().getSharedPreferences("settings", Context.MODE_PRIVATE);
-        userId = sp.getString("user_id",null);
+        userId = User.getUser(getActivity()).getId();
     }
 
     // TODO: Rename method, update argument and hook method into UI event

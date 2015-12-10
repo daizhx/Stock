@@ -5,16 +5,50 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.hengxuan.stock.R;
 import com.hengxuan.stock.SubActivity;
+import com.hengxuan.stock.http.HttpAPI;
+import com.hengxuan.stock.http.HttpJsonParser;
+import com.hengxuan.stock.http.HttpResponseParser;
+import com.hengxuan.stock.http.HttpUtils;
+import com.hengxuan.stock.http.MyJsonObjectRequest;
+import com.hengxuan.stock.utils.Log;
+
+import org.json.JSONObject;
 
 public class DpgdActivity extends Activity {
 
+    TextView content;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dpgd);
+        content = (TextView) findViewById(R.id.content);
+        setContent();
+    }
+
+    //set content async
+    void setContent(){
+        HttpUtils httpUtils = HttpUtils.getInstance(this);
+        String url = HttpAPI.GET_DPGD_CONTENT;
+        MyJsonObjectRequest myJsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                HttpJsonParser httpJsonParser = new HttpJsonParser(response);
+                String s = (String) httpJsonParser.getObject();
+                content.setText(s);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        });
+        httpUtils.addToRequestQueue(myJsonObjectRequest);
     }
 
     @Override

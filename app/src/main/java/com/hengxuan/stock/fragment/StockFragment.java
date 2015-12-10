@@ -175,25 +175,36 @@ public class StockFragment extends Fragment {
 			try {
 				item = (JSONObject) data.get(i);
 				String ds = item.getString("date");
-				String date = (String) DateFormat.format("yyyy-MM-dd", Long.parseLong(ds));
-				if(!date.equals(addedDate)){
-					ListSection section = new ListSection();
-					addedDate = section.title = date;
-					list.add(section);
-				}
+                if(ds != null) {
+                    String date = (String) DateFormat.format("yyyy-MM-dd", Long.parseLong(ds));
+                    if(!date.equals(addedDate)){
+                        ListSection section = new ListSection();
+                        addedDate = section.title = date;
+                        list.add(section);
+                    }
+                }else{
+                    //no time recode,pass
+                    continue;
+                }
+
 				String code = item.getString("code");
-				String comment = item.getString("comment");
+
 				String name = item.getString("name");
 				ListItem listitem = new ListItem();
 				listitem.stockCode = code;
 				listitem.stockName = name;
-				listitem.comment = comment;
 				if(name == "null"){
 					listitem.stockName = "";
 				}
-				if(comment == "null"){
-					listitem.comment = "";
-				}
+
+                if(mId == Constants.STOCKS_1) {
+                    String comment = item.getString("comment");
+                    listitem.comment = comment;
+                    if(comment == "null"){
+                        listitem.comment = "";
+                    }
+                }
+
 				list.add(listitem);
 				
 			} catch (JSONException e) {
@@ -211,18 +222,21 @@ public class StockFragment extends Fragment {
         String url = HttpAPI.GET_TODAY_STOCK + "/"+page+"/"+date;
         User user = User.getUser(getActivity());
         if(flag == Constants.STOCKS_2) {
-            url = HttpAPI.GET_MONTH_STOCK + "/" + user.getName() + "/"+page + "/" + date;
+            url = HttpAPI.GET_MONTH_STOCK + "/" + user.getId() + "/"+page + "/" + date;
         }else if(flag == Constants.STOCKS_3){
-            url = HttpAPI.GET_JG_STOCK + "/" + user.getName() + "/" + page + "/" + date;
+            url = HttpAPI.GET_JG_STOCK + "/" + user.getId() + "/" + page + "/" + date;
         }
+        Log.d("url="+url);
         jsonObjectRequest = new MyJsonObjectRequest
                 (Request.Method.GET, url, new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         JSONArray jasonArray = null;
-                        Log.d(response.toString());
+                        Log.d("result="+response.toString());
                         try {
-                            jasonArray = ((JSONObject)httpUtils.parseData(response)).getJSONArray("data");
+                            JSONObject data = (JSONObject)httpUtils.parseData(response);
+                            if(data == null)return;
+                            jasonArray = data.getJSONArray("data");
                             LinkedList list = parseData(jasonArray);
                             if(list.isEmpty()){
                                 mTVHint.setText(getString(R.string.no_data));

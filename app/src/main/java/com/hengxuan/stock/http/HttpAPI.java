@@ -23,4 +23,10 @@ public class HttpAPI {
     public static final String GET_HISTORICAL_MSG = URL_BASE + "get_new_tactics";
     //url to get bs sign
     public static final String GET_BS_SIGN = URL_BASE + "get_stock_trading_time";
+    //
+    public static final String GET_DPGD_CONTENT = URL_BASE + "get_grail_article";
+
+    public static final String ZFB_ZF_URL = "http://115.159.6.104/ehtrest/api/mall/index?identityId=";
+
+    public static final String CHECK_UPDATE = "http://115.159.6.104/ehtrest/api/soft/version_update/";
 }

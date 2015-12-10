@@ -174,11 +174,17 @@ public class StockMinutChartView extends View{
                 }
                 int id = signBSPoint.getSignId();
                 Bitmap bitmap = null;
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.outHeight=10;
+                options.outWidth=10;
+                options.inJustDecodeBounds = false;
+                options.inScaled = true;
                 if(id == SignPoint.BUY) {
-                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.buy);
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.buy,options);
                 }else if(id == SignPoint.SELL){
-                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sell);
+                    bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sell,options);
                 }
+                Log.d("bitmap.w="+bitmap.getWidth()+",h="+bitmap.getHeight());
                 float x = xStep*widthUnit;
                 float y = data[xStep][1];
                 if(bitmap != null) {
@@ -233,6 +239,7 @@ public class StockMinutChartView extends View{
             ratio = ((yHighValue - yBaseValue) / yBaseValue) * 100;
             widthUnit = (float) w / TIME;
             heightUnit = (float) h / (yHighValue - yLowValue);
+            Log.d("widthUnit="+widthUnit);
             data = new float[rawDataList.size()][2];
             for (int i = 0; i < rawDataList.size(); i++) {
                 data[i][0] = (float) (i * widthUnit);

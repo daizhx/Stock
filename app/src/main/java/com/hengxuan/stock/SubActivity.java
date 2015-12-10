@@ -35,21 +35,22 @@ public class SubActivity extends FragmentActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mActionBar = getActionBar();
-		mActionBar.setCustomView(R.layout.custom_action_bar);
-		icBack = (ImageView) findViewById(R.id.ic_back);
-		icBack.setVisibility(View.VISIBLE);
-		icBack.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				finish();
-			}
-		});
-		mTitle = (TextView) mActionBar.getCustomView().findViewById(R.id.title);
+//		mActionBar.setCustomView(R.layout.custom_action_bar);
+//		icBack = (ImageView) findViewById(R.id.ic_back);
+//		icBack.setVisibility(View.VISIBLE);
+//		icBack.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View v) {
+//				finish();
+//			}
+//		});
+//		mTitle = (TextView) mActionBar.getCustomView().findViewById(R.id.title);
 	}
 	
 	public void setTitle(String s){
-		mTitle.setText(s);
+        mActionBar.setTitle(s);
+//		mTitle.setText(s);
 	}
 
     protected void showPaySelector(){

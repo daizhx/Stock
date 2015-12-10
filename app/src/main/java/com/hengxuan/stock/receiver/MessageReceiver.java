@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.format.DateFormat;
@@ -183,7 +184,7 @@ public class MessageReceiver extends XGPushBaseReceiver {
 //        String msg = message.getContent();
 		// 获取自定义key-value
 		String customContent = message.getCustomContent();
-        updateNotification(context, customContent);
+        handleMsg(context, customContent);
 	}
 
     private static final int NO_MR = 1;
@@ -191,8 +192,25 @@ public class MessageReceiver extends XGPushBaseReceiver {
     private static final int NO_JG = 3;
     private static final int NO_JBYQ = 4;
     private static final int NO_NNW = 5;
+    private static final int NO_BS = 6;
 
-    private void updateNotification(Context context,String customContent){
+    private void notifyMsg(Context context,String content,Intent intent,int id){
+        String title = context.getResources().getString(R.string.app_name);
+        Uri uri = Uri.parse("android.resource://" + context.getPackageName() + "/raw/coins");
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, id, intent, 0);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        Notification.Builder builder = new Notification.Builder(context).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(title).setContentText(content).
+                setAutoCancel(true).setDefaults(Notification.DEFAULT_VIBRATE).setSound(uri).setContentIntent(pendingIntent);
+        Notification notification;
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN){
+            notification = builder.build();
+        }else {
+            notification = builder.getNotification();
+        }
+        notificationManager.notify(id,notification);
+    }
+    private void handleMsg(Context context,String customContent){
 		if (customContent != null && customContent.length() != 0) {
 			try {
 				JSONObject obj = new JSONObject(customContent);
@@ -200,75 +218,58 @@ public class MessageReceiver extends XGPushBaseReceiver {
 				if (!obj.isNull("type")) {
 					String type = obj.getString("type");
                     String content = obj.getString("content");
-
-                    int notificationId=0;
-                    String contentTitle = null;
                     String contentText = null;
                     Intent resultIntent = new Intent();
-
                     switch (type){
                         case "mr":
                             contentText = "今日精选股票，根据大数据挖掘，值得关注";
-                            resultIntent.setClass(context, MainActivity.class);
-                            notificationId = NO_MR;
+                            resultIntent.setClass(context, MyjxActivity.class);
+                            notifyMsg(context,contentText,resultIntent,NO_MR);
                             break;
                         case "my":
                             contentText = "本月精选股票，根据大数据挖掘，值得关注";
                             resultIntent.setClass(context, MyjxActivity.class);
-                            notificationId = NO_MY;
+                            notifyMsg(context, contentText, resultIntent, NO_MY);
                             break;
                         case "jg":
                             contentText = "机构买入股票，请关注";
                             resultIntent.setClass(context, JgmrActivity.class);
-                            notificationId = NO_JG;
+                            notifyMsg(context,contentText,resultIntent,NO_JG);
                             break;
                         case "NNSTOCK":
                             if(saveData2DB(context,"NNSTOCK",content) == -1){
                                 Log.e("save msg to db fail!");
                             }
-                            contentTitle = "牛牛炒股";
+//                            contentTitle = "牛牛炒股";
+                            JSONObject json = new JSONObject(content);
                             contentText = content;
                             resultIntent.setClass(context, ChatMsgActivity.class);
                             resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             resultIntent.putExtra("id", Constants.NNSTOCK_ID);
                             resultIntent.putExtra("content",content);
-                            notificationId = NO_NNW;
+                            notifyMsg(context, contentText, resultIntent, NO_NNW);
                             break;
                         case "JBSTOCK":
                             if(saveData2DB(context,"JBSTOCK",content) == -1){
                                 Log.e("save msg to db fail!");
                             }
-                            contentTitle = "聚宝一期";
+//                            contentTitle = "聚宝一期";
                             contentText = content;
                             resultIntent.setClass(context, ChatMsgActivity.class);
                             resultIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             resultIntent.putExtra("id", Constants.JBSTOCK_ID);
                             resultIntent.putExtra("content",content);
-                            notificationId = NO_JBYQ;
+                            Log.d("contentText="+contentText);
+                            notifyMsg(context,contentText,resultIntent,NO_JBYQ);
+                            break;
+                        case "bs":
+                            String code = obj.getString("code");
+                            String group = obj.getString("group");
+                            contentText = content;
                             break;
                         default:
-//                show(context, text);
                             break;
                     }
-
-                    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    Notification.Builder mBuilder = new Notification.Builder(context).setSmallIcon(R.mipmap.ic_launcher).setContentTitle(context.getResources().getString(R.string.app_name));
-                    if(contentTitle != null){
-                        mBuilder.setContentTitle(contentTitle);
-                    }
-                    mBuilder.setContentText(contentText);
-                    mBuilder.setAutoCancel(true);//like notification.flags = Notification.FLAG_AUTO_CANCEL;
-                    mBuilder.setDefaults(Notification.DEFAULT_SOUND);
-//                    mBuilder.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE));
-                    PendingIntent pendingIntent = PendingIntent.getActivity(context,notificationId,resultIntent,0);
-                    mBuilder.setContentIntent(pendingIntent);
-                    Notification notification;
-                    if(Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN){
-                        notification = mBuilder.build();
-                    }else {
-                        notification = mBuilder.getNotification();
-                    }
-                    notificationManager.notify(notificationId,notification);
 				}
 				// ...
 			} catch (JSONException e) {

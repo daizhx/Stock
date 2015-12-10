@@ -43,7 +43,7 @@ public class PayActivity extends SubActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_pay, menu);
+//        getMenuInflater().inflate(R.menu.menu_pay, menu);
         return true;
     }
 
@@ -57,6 +57,10 @@ public class PayActivity extends SubActivity{
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
+        }
+
+        if(id == android.R.id.home){
+            finish();
         }
 
         return super.onOptionsItemSelected(item);

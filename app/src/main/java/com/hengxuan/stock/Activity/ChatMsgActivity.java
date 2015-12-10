@@ -10,9 +10,12 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -35,7 +38,7 @@ public class ChatMsgActivity extends Activity {
 
     private ListView mList;
     private TextView tvHint;
-    private String who;
+    private String title;
     private LinkedList<Msg> msgList = new LinkedList<Msg>();
     private ChatMsgViewAdapter mChatMsgViewAdapter;
     //分析师Id
@@ -52,18 +55,17 @@ public class ChatMsgActivity extends Activity {
         Intent intent= getIntent();
         mId = intent.getIntExtra("id",-1);
         if(mId == Constants.JBSTOCK_ID){
-            String name =getString(R.string.jubaoyiqi);
-            setTitle(name);
+            title =getString(R.string.jubaoyiqi);
             initCursor("JBSTOCK");
         }else if(mId == Constants.NNSTOCK_ID){
-            String name = getString(R.string.niuniuchaogu);
-            setTitle(name);
+            title = getString(R.string.niuniuchaogu);
             initCursor("NNSTOCK");
 
         }else{
             //wrong
             finish();
         }
+        setTitle(title);
         newestMsg = intent.getStringExtra("content");
         Log.d("mId="+mId+",msg="+newestMsg);
 //        //TODO Msg没有时间戳
@@ -78,7 +80,29 @@ public class ChatMsgActivity extends Activity {
         tvHint = (TextView) findViewById(R.id.hint);
         mChatMsgViewAdapter = new ChatMsgViewAdapter(this,msgList);
         mList.setAdapter(mChatMsgViewAdapter);
-        new DataLoader().execute();
+        registerForContextMenu(mList);
+//        new DataLoader().execute();
+        getData();
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_del,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo adapterContextMenuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        if(item.getItemId() == R.id.menu_del){
+            int position = adapterContextMenuInfo.position;
+            Msg msg = msgList.get(position);
+            delData(""+msg.id);
+            return true;
+        }else {
+            return super.onContextItemSelected(item);
+        }
     }
 
     @Override
@@ -92,7 +116,7 @@ public class ChatMsgActivity extends Activity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_info, menu);
+//        getMenuInflater().inflate(R.menu.menu_info, menu);
         return true;
     }
 
@@ -134,7 +158,7 @@ public class ChatMsgActivity extends Activity {
     private void initCursor(String name){
         DatabaseHelper databaseHelper = new DatabaseHelper(this);
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
-        String[] projection = {DataContract.CpMsgEntry.COLUMN_TIME, DataContract.CpMsgEntry.COLUMN_CONTENT};
+        String[] projection = {DataContract.CpMsgEntry._ID,DataContract.CpMsgEntry.COLUMN_TIME, DataContract.CpMsgEntry.COLUMN_CONTENT};
         String sortOrder = DataContract.CpMsgEntry.COLUMN_TIME + " ASC";
         String section = DataContract.CpMsgEntry.COLUMN_NAME + " = ?";
         String[] sectionArgs = {name};
@@ -148,22 +172,35 @@ public class ChatMsgActivity extends Activity {
             if(size == 0)return size;
             if(size > 20){
                 for(int i=0;i<20;i++){
+                    int id = cursor.getInt(cursor.getColumnIndex(DataContract.CpMsgEntry._ID));
                     String time = cursor.getString(cursor.getColumnIndex(DataContract.CpMsgEntry.COLUMN_TIME));
                     String content = cursor.getString(cursor.getColumnIndex(DataContract.CpMsgEntry.COLUMN_CONTENT));
                     Msg msg = new Msg(time,content);
+                    msg.id = id;
                     msgList.addFirst(msg);
+                    cursor.moveToPrevious();
                 }
             }else{
                 for(int i=0;i<size;i++){
-                    String time = cursor.getString(cursor.getColumnIndex(DataContract.CpMsgEntry.COLUMN_TIME));
-                    String content = cursor.getString(cursor.getColumnIndex(DataContract.CpMsgEntry.COLUMN_CONTENT));
+                    int id = cursor.getInt(cursor.getColumnIndexOrThrow(DataContract.CpMsgEntry._ID));
+                    String time = cursor.getString(cursor.getColumnIndexOrThrow(DataContract.CpMsgEntry.COLUMN_TIME));
+                    String content = cursor.getString(cursor.getColumnIndexOrThrow(DataContract.CpMsgEntry.COLUMN_CONTENT));
                     Msg msg = new Msg(time,content);
+                    msg.id = id;
                     msgList.addFirst(msg);
+                    cursor.moveToPrevious();
                 }
             }
             mChatMsgViewAdapter.notifyDataSetChanged();
             return size;
         }
         return 0;
+    }
+
+    private void delData(String id){
+        DatabaseHelper databaseHelper = new DatabaseHelper(this);
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        String where = DataContract.CpMsgEntry._ID + " = ?";
+        db.delete(DataContract.CpMsgEntry._ID,where,new String[]{id});
     }
 }

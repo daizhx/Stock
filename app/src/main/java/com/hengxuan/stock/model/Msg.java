@@ -6,6 +6,7 @@ import android.util.Pair;
  * Created by Administrator on 2015/8/24.
  */
 public class Msg extends Pair<String,String> {
+    public int id;
     /**
      * Constructor for a Pair.
      *

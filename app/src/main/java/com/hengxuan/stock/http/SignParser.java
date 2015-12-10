@@ -1,6 +1,7 @@
 package com.hengxuan.stock.http;
 
 import com.hengxuan.stock.data.SignPoint;
+import com.hengxuan.stock.utils.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -12,10 +13,15 @@ import java.util.Calendar;
  * Created by Administrator on 2015/10/26.
  */
 public class SignParser extends HttpJsonParser{
-    JSONArray data;
+    JSONArray data = null;
     public SignParser(JSONObject response){
         super(response);
-        data = (JSONArray) getObject();
+        Log.d(response.toString());
+        Object object = getObject();
+        Log.d(object.toString());
+        if(object != null && !object.equals(null)){
+            data = (JSONArray) object;
+        }
     }
 
     public int getSignNum(){

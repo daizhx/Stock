@@ -4,7 +4,7 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
     <com.hengxuan.stock.widget.CircleViewPager android:layout_width="match_parent"
-                                               android:layout_height="200dp"
+                                               android:layout_height="160dp"
                                                android:id="@+id/circleviewpager"></com.hengxuan.stock.widget.CircleViewPager>
 
     <LinearLayout android:layout_width="match_parent"

@@ -11,7 +11,9 @@
     <com.hengxuan.stock.widget.PullToRefreshPinnedHeaderListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@android:id/list">
+        android:id="@android:id/list"
+        android:scrollbars="none"
+        android:layout_marginTop="-2dp">
     </com.hengxuan.stock.widget.PullToRefreshPinnedHeaderListView>
 
 

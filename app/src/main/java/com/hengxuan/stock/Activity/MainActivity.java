@@ -165,7 +165,7 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
 //				fragmentSelect = new ZXGFragment();
 //			}
 //			mFM.beginTransaction().replace(R.id.container, fragmentSelect, NewsListFragment.class.getSimpleName()).commit();
-            viewPager.setCurrentItem(1);
+            viewPager.setCurrentItem(1,false);
 			currentTab = R.id.select;
 			break;
 		case R.id.stocks:
@@ -173,7 +173,7 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
 //				stocks = new StockFragment();
 //			}
 //			mFM.beginTransaction().replace(R.id.container, stocks, StocksListFragment.class.getSimpleName()).commit();
-            viewPager.setCurrentItem(2);
+            viewPager.setCurrentItem(2,false);
 			currentTab = R.id.stocks;
 			break;
 		case R.id.member:
@@ -181,7 +181,7 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
 //                settingsFragment = new SettingsFragment();
 //            }
 //            mFM.beginTransaction().replace(R.id.container, settingsFragment, SettingsFragment.class.getSimpleName()).commit();
-            viewPager.setCurrentItem(3);
+            viewPager.setCurrentItem(3,false);
             currentTab = R.id.member;
 			break;
 		case R.id.home:
@@ -189,7 +189,7 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
 //				homeFragment = new HomeFragment();
 //			}
 //			mFM.beginTransaction().replace(R.id.container, homeFragment,HomeFragment.class.getSimpleName()).commit();
-            viewPager.setCurrentItem(0);
+            viewPager.setCurrentItem(0,false);
 			currentTab = R.id.home;
 			break;
 		default:
