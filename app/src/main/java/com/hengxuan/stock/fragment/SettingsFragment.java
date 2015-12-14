@@ -107,10 +107,10 @@ public class SettingsFragment extends Fragment {
         tvTitle.setText(R.string.member);
         final TextView userName = (TextView) root.findViewById(R.id.user_name);
         final View btn = root.findViewById(R.id.btn_login);
+        final User user = User.getUser(getActivity());
         ListView listview = (ListView) root.findViewById(R.id.list);
         listview.setAdapter(new SimpleAdapter(getActivity(), list, R.layout.user_setting_item, keys, new int[]{R.id.text, R.id.second_text}));
 //        listview.setEnabled(false);
-        final User user = User.getUser(getActivity());
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -128,9 +128,11 @@ public class SettingsFragment extends Fragment {
                         Toast.makeText(getActivity(),R.string.newest_version,Toast.LENGTH_SHORT).show();
                         break;
                     case 2:
-                        user.hasLogout();
-                        btn.setVisibility(View.VISIBLE);
-                        userName.setVisibility(View.INVISIBLE);
+                        if(user.isLogin()) {
+                            user.hasLogout();
+                            btn.setVisibility(View.VISIBLE);
+                            userName.setVisibility(View.INVISIBLE);
+                        }
                         break;
                     default:
                         break;
@@ -138,10 +140,10 @@ public class SettingsFragment extends Fragment {
             }
         });
         if(user.isLogin()){
-            btn.setVisibility(View.VISIBLE);
+            btn.setVisibility(View.INVISIBLE);
             userName.setText(user.getName());
         }else{
-            btn.setVisibility(View.INVISIBLE);
+            btn.setVisibility(View.VISIBLE);
         }
         mTVUserId = (TextView) root.findViewById(R.id.user_id);
         mTVUserId.setText("ID: "+userId);

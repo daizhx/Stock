@@ -9,7 +9,6 @@ import com.hengxuan.stock.fragment.NewsListFragment;
 import com.hengxuan.stock.fragment.ProfitFragment;
 import com.hengxuan.stock.fragment.SettingsFragment;
 import com.hengxuan.stock.fragment.StockFragment;
-import com.hengxuan.stock.fragment.StocksListFragment;
 import com.hengxuan.stock.fragment.ZXGFragment;
 import com.hengxuan.stock.user.User;
 import com.hengxuan.stock.utils.Log;

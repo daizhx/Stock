@@ -9,6 +9,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -231,4 +232,29 @@ public class StartActivity extends Activity {
 //        mHideHandler.removeCallbacks(mHideRunnable);
 //        mHideHandler.postDelayed(mHideRunnable, delayMillis);
 //    }
+
+
+    private void CheckUpdate(){
+        String packageName = getPackageName();
+        try {
+            int versionCode = getPackageManager().getPackageInfo(packageName,0).versionCode;
+            String url = HttpAPI.CHECK_UPDATE + packageName + "/" + getPackageManager().getPackageInfo(packageName,0).versionCode + "/2";
+            HttpUtils httpUtils = HttpUtils.getInstance(this);
+            MyJsonObjectRequest myJsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+
+                }
+            });
+            httpUtils.addToRequestQueue(myJsonObjectRequest);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+
+    }
 }

@@ -42,7 +42,7 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="20dp"
             android:id="@+id/btn_login"
-            android:visibility="invisible"/>
+			android:background="@drawable/button_bg"/>
 	</RelativeLayout>
 	
 	<ListView android:layout_width="match_parent"

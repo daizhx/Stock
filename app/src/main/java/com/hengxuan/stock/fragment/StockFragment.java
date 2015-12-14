@@ -104,10 +104,15 @@ public class StockFragment extends Fragment {
                     TextView text2 = (TextView) view.findViewById(android.R.id.text2);
                     CharSequence name = text1.getText();
                     CharSequence code = text2.getText();
-                    Intent intent = new Intent(INTENT_ACTION_STOCK_ANALYST);
-                    intent.putExtra(EXTRA_STOCK_CODE,code);
-                    intent.putExtra(EXTRA_STOCK_NAME,name);
-                    startActivity(intent);
+                    if(code.toString().endsWith("***")) {
+                       ChargeDialogFragment chargeDialogFragment = new ChargeDialogFragment();
+                        chargeDialogFragment.show(getFragmentManager(),ChargeDialogFragment.class.getSimpleName());
+                    }else{
+                        Intent intent = new Intent(INTENT_ACTION_STOCK_ANALYST);
+                        intent.putExtra(EXTRA_STOCK_CODE, code);
+                        intent.putExtra(EXTRA_STOCK_NAME, name);
+                        startActivity(intent);
+                    }
                 }else if(type == MyPinnedSectionListAdapter.SECTION){
 
                 }else {
@@ -275,9 +280,10 @@ public class StockFragment extends Fragment {
                         mBtnRetry.setOnClickListener(new OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                getData(mId,0);
+                                getData(mId, 0);
                             }
                         });
+						mPullToRefreshPinnedSectionListView.onRefreshComplete();
                     }
                 });
 

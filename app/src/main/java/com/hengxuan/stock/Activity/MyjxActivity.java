@@ -4,7 +4,6 @@ import com.hengxuan.stock.R;
 import com.hengxuan.stock.SubActivity;
 import com.hengxuan.stock.application.Constants;
 import com.hengxuan.stock.fragment.StockFragment;
-import com.hengxuan.stock.fragment.StocksListFragment;
 import com.hengxuan.stock.utils.Log;
 
 import android.app.ActionBar;
