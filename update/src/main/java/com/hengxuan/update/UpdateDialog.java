@@ -1,11 +1,14 @@
 package com.hengxuan.update;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -55,7 +58,7 @@ public class UpdateDialog extends DialogFragment {
     private Button btn01, btn02;
     private ImageView iv_icon;
     private ImageView imageView_01;
-    private TextView tv_title, tv_per;
+    private TextView tv_per;
     TextView customer_reply_msg;
     private ProgressBar mBar;
     private boolean isFrist = true;
@@ -85,6 +88,39 @@ public class UpdateDialog extends DialogFragment {
     // // }
     // return f;
     // }
+
+    public void show(FragmentActivity activity,String updateMessage,String updateUrl,int flag){
+        this.updateStatus = flag;
+        this.updateMessage = updateMessage;
+        serverTime = System.currentTimeMillis();
+        this.updateUrl = updateUrl;
+
+        Log.d("stock","updateFlag="+flag+",updatemsg="+updateMessage+",update url="+updateUrl);
+
+        long timeLast = Util_TempDate.getServerTime(activity);
+        long tmpLocalMilli = new Date().getTime() / 1000;
+        if (updateStatus == STATE_OPTION_UPDATE && (tmpLocalMilli - timeLast > 24 * 60 * 60)) {
+            Fragment arg0 = activity.getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
+            if (arg0 != null) {
+                try {
+                    activity.getSupportFragmentManager().beginTransaction().remove(arg0);
+                } catch (Exception e) { // TODO: handle exception
+                    e.printStackTrace();
+                }
+            }
+            show(activity.getSupportFragmentManager(), DIALOG_TAG);
+        } else if (updateStatus == STATE_MUST_UPDATE) {
+            Fragment arg0 = activity.getSupportFragmentManager().findFragmentByTag(DIALOG_TAG);
+            if (arg0 != null) {
+                try {
+                    activity.getSupportFragmentManager().beginTransaction().remove(arg0);
+                } catch (Exception e) { // TODO: handle exception
+                    e.printStackTrace();
+                }
+            }
+            show(activity.getSupportFragmentManager(), DIALOG_TAG);
+        }
+    }
 
     public void show(FragmentActivity transaction, String result) {
         if (null != result) {
@@ -127,12 +163,19 @@ public class UpdateDialog extends DialogFragment {
         }
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         // TODO Auto-generated method stub
         super.onCreate(savedInstanceState);
 //        setStyle(R.style.AliDialog, R.style.AliDialog);
 
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        return super.onCreateDialog(savedInstanceState);
     }
 
     @Override
@@ -142,19 +185,20 @@ public class UpdateDialog extends DialogFragment {
 
         btn01 = (Button) view.findViewById(R.id.alert_dialog_btn01);
         btn02 = (Button) view.findViewById(R.id.alert_dialog_btn02);
-        iv_icon = (ImageView) view.findViewById(R.id.alert_dialog_iv_icon);
+        //iv_icon = (ImageView) view.findViewById(R.id.alert_dialog_iv_icon);
         imageView_01 = (ImageView) view.findViewById(R.id.id_imageView_01);
-        tv_title = (TextView) view.findViewById(R.id.alert_dialog_tv_title);
+        //tv_title = (TextView) view.findViewById(R.id.alert_dialog_tv_title);
         customer_reply_msg = (TextView) view.findViewById(R.id.customer_reply_msg);
         tv_per = (TextView) view.findViewById(R.id.customer_reply_per);
         customer_reply_msg.setText(updateMessage);
-        tv_title.setText(R.string.app_name);
+        //tv_title.setText(R.string.app_name);
         mBar = (ProgressBar) view.findViewById(R.id.progressBar1);
         btn01.setOnClickListener(clickListener);
         btn02.setOnClickListener(clickListener);
         if (updateStatus == 2) {
             btn02.setText(android.R.string.cancel);
         }
+        getDialog().setTitle(R.string.app_update);
         return view;
     }
 
@@ -194,6 +238,7 @@ public class UpdateDialog extends DialogFragment {
                 dismiss();
                 if (updateStatus == STATE_MUST_UPDATE && !downloadWeb) {
 //                    AppManager.getAppManager().AppExit(getActivity(), false);
+                    getActivity().finish();
                 } else if (updateStatus == STATE_MUST_UPDATE && downloadWeb) {
 //                    String downloadUrl = ConstFuncId.DOWNLOADURL;
                     String downloadUrl = "http://eht.hk/downList.asp";
@@ -226,6 +271,7 @@ public class UpdateDialog extends DialogFragment {
             URL urlStr = null;
             if (params[0] != null) {
                 try {
+                    Log.d("stock","URL="+params[0]);
                     urlStr = new URL(params[0]);
                 } catch (MalformedURLException e) {
                     // TODO Auto-generated catch block
@@ -275,6 +321,7 @@ public class UpdateDialog extends DialogFragment {
                         conn.disconnect();
                     }
                 } else if (result.equals(FileUtils.ERROR)) {
+                    //TODO
 
                 } else {
                     mBar.setVisibility(View.INVISIBLE);
@@ -330,6 +377,8 @@ public class UpdateDialog extends DialogFragment {
             it.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(it);
+
+            getActivity().finish();
         }
 
         /**

@@ -8,7 +8,7 @@ android {
         applicationId "com.hengxuan.stock"
         minSdkVersion 14
         targetSdkVersion 22
-        versionCode 9
+        versionCode 10
         versionName "1.5.3"
     }
     buildTypes {
@@ -29,9 +29,12 @@ dependencies {
     compile files('libs/universal-image-loader-1.9.3-with-sources.jar')
     compile project(':pulltorefresh')
     compile project(':PinnedSectionListview')
-    compile project(':android-volley')
+    //compile project(':android-volley')
+    compile 'com.mcxiaoke.volley:library:1.0.19'
+
     compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.android.support:gridlayout-v7:22.1.1'
     compile project(':dslv')
+    compile project(':update')
 }

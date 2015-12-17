@@ -129,6 +129,10 @@ public class StockMinuteActivity extends Activity {
                 @Override
                 public void onResponse(String response) {
                     if(response != null){
+                        if(response.equals("pv_none_match=1;")){
+                            Log.e("stock code error");
+                            return;
+                        }
                         String[] ss = response.split("\"");
                         String[] data = ss[1].split("~");
                         closingPrice = Float.parseFloat(data[4]);

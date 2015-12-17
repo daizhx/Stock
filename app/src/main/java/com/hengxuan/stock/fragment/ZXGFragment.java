@@ -102,34 +102,21 @@ public class ZXGFragment extends Fragment {
     private static final int UPDATE_DURATION=5*1000;
     private ImageView ivDataRefreshInd;
     private static final int MSG_DATA_UPDATE = 0;
-    private Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what){
-                case MSG_DATA_UPDATE:
-                    if(StockFormula.isOpenTime()) {
-                        AnimationDrawable animationDrawable = (AnimationDrawable) ivDataRefreshInd.getDrawable();
-                        animationDrawable.stop();
-                        animationDrawable.start();
-                        refreshZxgDataList();
-                        if (getView().isShown()) {
-                            Log.i("msg update zxg data");
-                            Message msg1 = Message.obtain();
-                            msg1.what = MSG_DATA_UPDATE;
-                            mHandler.sendMessageDelayed(msg1, UPDATE_DURATION);
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
 
     private DatabaseHelper mDatabaseHelper;
 
     private static final int EDIT_REQUEST = 6;
 
+    private int stocksNum = 0;
+
+    //refresh stocks data and indicate
+    public void refresh(){
+        Log.i("zxg refresh:"+ivDataRefreshInd);
+        refreshZxgDataList();
+        AnimationDrawable animationDrawable = (AnimationDrawable) ivDataRefreshInd.getDrawable();
+        animationDrawable.stop();
+        animationDrawable.start();
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
@@ -205,10 +192,14 @@ public class ZXGFragment extends Fragment {
             return 1;
         }
     }
+
+
+
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        Log.d("onCreateView zxg--------");
         final View root =  inflater.inflate(R.layout.fragment_zxg, container, false);
         ivDataRefreshInd = (ImageView) root.findViewById(R.id.data_refresh_ind);
         ivDataRefreshInd.setVisibility(View.VISIBLE);
@@ -335,6 +326,11 @@ public class ZXGFragment extends Fragment {
         }
     }
 
+    public int getStocksNum(){
+        return stocksNum;
+    }
+
+    //read zxg list from db and init zxgdatalist
     private void initZxgDataList(){
         mDatabaseHelper = new DatabaseHelper(getActivity());
         SQLiteDatabase db = mDatabaseHelper.getReadableDatabase();
@@ -349,14 +345,13 @@ public class ZXGFragment extends Fragment {
             do {
                 String name = c.getString(c.getColumnIndexOrThrow(DataContract.ZXGEntry.COLUMN_NAME));
                 String code = c.getString(c.getColumnIndexOrThrow(DataContract.ZXGEntry.COLUMN_CODE));
-//                String[] ss = new String[]{name,code};
-//                zxgList.add(ss);
                 Map map = new HashMap();
                 map.put(ZXGData.NAME,name);
                 map.put(ZXGData.CODE,code);
                 zxgdatalist.add(map);
             } while (c.moveToNext());
         }
+        stocksNum = zxgdatalist.size();
     }
 
     private void refreshZxgDataList(){
@@ -478,35 +473,11 @@ public class ZXGFragment extends Fragment {
         Log.d("on attach");
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(mHandler != null) {
-            if(getView().isShown()) {
-                Log.d("===========================");
-                Message msg = Message.obtain();
-                msg.what = MSG_DATA_UPDATE;
-                mHandler.sendMessageDelayed(msg, UPDATE_DURATION);
-            }
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.i("onPause");
-        if(mHandler != null){
-            mHandler.removeMessages(0);
-        }
-    }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-        if(mHandler != null){
-            mHandler.removeMessages(0);
-        }
         Log.d("on detach");
     }
 
@@ -644,12 +615,9 @@ public class ZXGFragment extends Fragment {
         Log.d("2--requestCode="+requestCode+",resultCode="+requestCode);
         if(requestCode == EDIT_REQUEST && resultCode == Activity.RESULT_OK){
             Log.i("edit success");
-            if(mHandler != null) {
-                mHandler.removeMessages(MSG_DATA_UPDATE);
-                initZxgDataList();
-                refreshZxgDataList();
-                zXstockListAdapter.notifyDataSetChanged();
-            }
+            initZxgDataList();
+            refreshZxgDataList();
+            zXstockListAdapter.notifyDataSetChanged();
         }
     }
 }

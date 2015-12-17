@@ -7,12 +7,15 @@ import com.hengxuan.stock.Activity.util.SystemUiHider;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.FragmentActivity;
 import android.telephony.TelephonyManager;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +25,9 @@ import com.hengxuan.stock.R;
 import com.hengxuan.stock.http.HttpAPI;
 import com.hengxuan.stock.http.HttpUtils;
 import com.hengxuan.stock.http.MyJsonObjectRequest;
+import com.hengxuan.stock.http.VersionUpdateParser;
 import com.hengxuan.stock.utils.Log;
+import com.hengxuan.update.UpdateDialog;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +40,7 @@ import java.io.IOException;
  *
  * @see SystemUiHider
  */
-public class StartActivity extends Activity {
+public class StartActivity extends FragmentActivity {
     /**
      * Whether or not the system UI should be auto-hidden after
      * {@link #AUTO_HIDE_DELAY_MILLIS} milliseconds.
@@ -65,6 +70,7 @@ public class StartActivity extends Activity {
     private SystemUiHider mSystemUiHider;
 
     private String userId;
+    private boolean needUpdate = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +144,7 @@ public class StartActivity extends Activity {
         // while interacting with the UI.
 //        findViewById(R.id.dummy_button).setOnTouchListener(mDelayHideTouchListener);
         getUserId();
+        checkUpdate();
     }
 
     @Override
@@ -178,10 +185,12 @@ public class StartActivity extends Activity {
     Runnable mRunnable = new Runnable() {
         @Override
         public void run() {
-            Intent intent = new Intent(StartActivity.this,MainActivity.class);
-            intent.putExtra("userId",userId);
-            startActivity(intent);
-            finish();
+            if(!needUpdate) {
+                Intent intent = new Intent(StartActivity.this, MainActivity.class);
+                intent.putExtra("userId", userId);
+                startActivity(intent);
+                finish();
+            }
         }
     };
     private void delayGoHome(int delayMillis){
@@ -190,7 +199,7 @@ public class StartActivity extends Activity {
     }
 
     private void getUserId(){
-        final SharedPreferences sp = getSharedPreferences("settings",MODE_PRIVATE);
+        final SharedPreferences sp = getSharedPreferences("settings", MODE_PRIVATE);
         userId = sp.getString("user_id",null);
         if(userId == null){
             final HttpUtils httpUtils = HttpUtils.getInstance(this);
@@ -234,21 +243,32 @@ public class StartActivity extends Activity {
 //    }
 
 
-    private void CheckUpdate(){
+    public void checkUpdate(){
         String packageName = getPackageName();
         try {
-            int versionCode = getPackageManager().getPackageInfo(packageName,0).versionCode;
+            final int versionCode = getPackageManager().getPackageInfo(packageName,0).versionCode;
             String url = HttpAPI.CHECK_UPDATE + packageName + "/" + getPackageManager().getPackageInfo(packageName,0).versionCode + "/2";
             HttpUtils httpUtils = HttpUtils.getInstance(this);
             MyJsonObjectRequest myJsonObjectRequest = new MyJsonObjectRequest(url, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
+                    Log.d(response.toString());
+                    VersionUpdateParser versionUpdateParser = new VersionUpdateParser(response);
+                    String msg = versionUpdateParser.getUpdateMsg();
+                    String url = versionUpdateParser.getUrl();
+                    int flag = versionUpdateParser.getUpdateFlag();
+                    int versionCode = versionUpdateParser.getUpdateVersion();
+                    int localVersionCode = getVersionCode();
+                    Log.d("versionCode="+versionCode+",local="+localVersionCode);
+                    if(localVersionCode < versionCode && url != null && !url.isEmpty()){
+                        needUpdate = true;
+                        showUpdateDialog(msg, url, flag);
+                    }
 
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-
                 }
             });
             httpUtils.addToRequestQueue(myJsonObjectRequest);
@@ -256,5 +276,20 @@ public class StartActivity extends Activity {
             e.printStackTrace();
         }
 
+    }
+
+    private int getVersionCode(){
+        try {
+            PackageInfo pif = getPackageManager().getPackageInfo(getPackageName(), 0);
+            return pif.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public void showUpdateDialog(String msg,String url,int flag){
+        UpdateDialog updateDialog = new UpdateDialog();
+        updateDialog.show(StartActivity.this,msg,url,flag);
     }
 }

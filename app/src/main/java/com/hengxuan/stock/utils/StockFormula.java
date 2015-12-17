@@ -11,7 +11,7 @@ public class StockFormula {
     /**
      * get exchange code on stock code
      * @param code
-     * @return
+     * @returny
      */
     public static String hostExchange(String code){
         if(code.startsWith("60")){

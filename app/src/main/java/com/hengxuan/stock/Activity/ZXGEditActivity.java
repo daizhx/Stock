@@ -282,6 +282,10 @@ public class ZXGEditActivity extends Activity implements LoaderManager.LoaderCal
             return true;
         }
 
+        if(id == R.id.home){
+            onBackPressed();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 

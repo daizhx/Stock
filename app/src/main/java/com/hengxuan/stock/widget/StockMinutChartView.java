@@ -37,10 +37,7 @@ import java.util.zip.CheckedOutputStream;
  * TODO: document your custom view class.
  */
 public class StockMinutChartView extends View{
-    private int mExampleColor = Color.RED; // TODO: use a default from R.color...
-    private float mExampleDimension = 0; // TODO: use a default from R.dimen...
 
-    private SurfaceHolder mHolder;
     private TextPaint mTextPaint;
     private float mTextWidth;
     private float mTextHeight;
@@ -48,6 +45,7 @@ public class StockMinutChartView extends View{
     private String mText;
 
     private ArrayList rawDataList;
+    private int dataSize = 0;
     private float[][] data;
     private float widthUnit;
     private float heightUnit;
@@ -96,6 +94,7 @@ public class StockMinutChartView extends View{
         yBaseValue = base;
         rawDataList = arrayList;
         redraw_type = DATA_UPDATE_REDRAW;
+        dataSize = arrayList.size();
         invalidate();
     }
 
@@ -170,7 +169,7 @@ public class StockMinutChartView extends View{
                     xStep = (hour - 9) * 60 + minute - 30;
                 }
                 if(13 <= hour && hour <= 15){
-                    xStep = 120 + (hour - 13)*60 + minute + 1;//+1是让13点从11:30的位置偏移一个步长开始
+                    xStep = 120 + (hour - 13)*60 + minute + 1;//
                 }
                 int id = signBSPoint.getSignId();
                 Bitmap bitmap = null;
@@ -185,10 +184,12 @@ public class StockMinutChartView extends View{
                     bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.sell,options);
                 }
                 Log.d("bitmap.w="+bitmap.getWidth()+",h="+bitmap.getHeight());
-                float x = xStep*widthUnit;
-                float y = data[xStep][1];
-                if(bitmap != null) {
-                    canvas.drawBitmap(bitmap,x,y,mPaint);
+                if(xStep < dataSize) {//make sure not out of arrays
+                    float x = xStep * widthUnit;
+                    float y = data[xStep][1];
+                    if (bitmap != null) {
+                        canvas.drawBitmap(bitmap, x, y, mPaint);
+                    }
                 }
             }
         }
@@ -356,16 +357,18 @@ public class StockMinutChartView extends View{
      */
     public void showInterSection(boolean show,float x) {
         Log.d("show intersection:"+show+",x="+x);
-        if(show && rawDataList != null) {
-            int num = (int) (x / widthUnit);
-            if(num < data.length) {
-                xPoint = data[num][0];
-                yPoint = data[num][1];
+        if(data != null) {
+            if (show && rawDataList != null) {
+                int num = (int) (x / widthUnit);
+                if (num < data.length) {
+                    xPoint = data[num][0];
+                    yPoint = data[num][1];
+                }
             }
+            isShowInterSection = show;
+            redraw_type = TOUCH_REDRAW;
+            invalidate();
         }
-        isShowInterSection = show;
-        redraw_type = TOUCH_REDRAW;
-        invalidate();
     }
 
 

@@ -1,9 +1,8 @@
 package com.hengxuan.stock.http;
 
-/**
- * Created by Administrator on 2015/8/18.
- */
+
 public class HttpAPI {
+    public static final String SERVER_ROOT = "http://115.159.6.104/";
     public static final String URL_BASE = "http://115.159.6.104/ehtrest/api/stock/";
 //    public static final String URL_BASE = "http://192.168.1.2/ehtrest/api/stock/";
     //api

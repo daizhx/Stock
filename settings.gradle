@@ -1,2 +1,2 @@
-include ':app', ':pulltorefresh', ':PinnedSectionListview', ':android-volley', ':update'
-include ':dslv'
+include ':app', ':android-volley',':dslv', ':pulltorefresh', ':PinnedSectionListview','update'
+//include ':dslv', ':pulltorefresh', ':PinnedSectionListview', ':update'

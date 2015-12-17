@@ -12,6 +12,7 @@ import com.hengxuan.stock.fragment.StockFragment;
 import com.hengxuan.stock.fragment.ZXGFragment;
 import com.hengxuan.stock.user.User;
 import com.hengxuan.stock.utils.Log;
+import com.hengxuan.stock.utils.StockFormula;
 import com.tencent.android.tpush.XGIOperateCallback;
 import com.tencent.android.tpush.XGPushConfig;
 import com.tencent.android.tpush.XGPushManager;
@@ -24,6 +25,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -47,29 +50,25 @@ import android.widget.TextView;
 import org.w3c.dom.Text;
 
 public class MainActivity extends FragmentActivity implements OnCheckedChangeListener{
-	RadioGroup tabs;
+    private static final int MSG_UPDATE_ZXG = 0;
+    RadioGroup tabs;
 	RadioButton btnSelect;
 	RadioButton btnStocks;
 	RadioButton btnMember;
 	RadioButton btnHome;
-    ZXGFragment fragmentSelect;
-//	NewsListFragment newsList;
-	StockFragment stocks;
-//	MemberFragment memberFragment;
-    SettingsFragment settingsFragment;
-	HomeFragment homeFragment;
 	FragmentManager mFM;
 	private int currentTab = 0;
 	public static float density;
 	private static final int REQUEST_LOGIN = 110;
-	private static final int LOGIN_SUCCESS = 111;
-	private static final int LOGIN_CANCEL = 112;
 
-//    private ActionBar mActionBar;
 	private String userId;
 
     private ViewPager viewPager;
     private FragmentPagerAdapter fragmentPagerAdapter;
+
+    private Handler mHandler;
+    private Fragment[] fragments = new Fragment[4];
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,15 +88,37 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
         viewPager.setOffscreenPageLimit(3);
         fragmentPagerAdapter = new MyAdapter(mFM);
         viewPager.setAdapter(fragmentPagerAdapter);
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 1) {
+                    Fragment f = fragments[1];
+                    if(f != null && ((ZXGFragment)f).getStocksNum() > 0 && StockFormula.isOpenTime()) {
+                        ((ZXGFragment) f).refresh();
+                        mHandler.sendEmptyMessageDelayed(MSG_UPDATE_ZXG, 5 * 1000);
+                    }
+                } else {
+                    mHandler.removeMessages(MSG_UPDATE_ZXG);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
         ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT);
-        ((FrameLayout) findViewById(R.id.container)).addView(viewPager,layoutParams);
+        ((FrameLayout) findViewById(R.id.container)).addView(viewPager, layoutParams);
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         density = displayMetrics.density;
 
-        Log.d("register xg account111" +
-                "="+userId);
         XGPushConfig.enableDebug(this, true);
         if(userId != null) {
             XGPushManager.registerPush(getApplicationContext(), userId,
@@ -130,6 +151,21 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
                         }
                     });
         }
+
+        mHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                switch (msg.what){
+                    case MSG_UPDATE_ZXG:
+                        ((ZXGFragment)fragments[1]).refresh();
+                        mHandler.sendEmptyMessageDelayed(MSG_UPDATE_ZXG,5*1000);
+                        break;
+                    default:
+                        break;
+                }
+
+            }
+        };
     }
 
     @Override
@@ -137,6 +173,10 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
     	super.onResume();
     	if(currentTab == R.id.select){
         	btnSelect.setChecked(true);
+            Fragment f = fragments[1];
+            if(f != null && ((ZXGFragment)f).getStocksNum() > 0 && StockFormula.isOpenTime()) {
+                mHandler.sendEmptyMessageDelayed(MSG_UPDATE_ZXG, 5 * 1000);
+            }
         }else if(currentTab == R.id.stocks){
         	btnStocks.setChecked(true);
         }else if(currentTab == R.id.member){
@@ -148,6 +188,16 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
         	currentTab = R.id.home;
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mHandler != null){
+            mHandler.removeMessages(MSG_UPDATE_ZXG);
+        }
+
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -209,7 +259,7 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
 		}
 	}
 
-    public static class MyAdapter extends FragmentPagerAdapter{
+    private class MyAdapter extends FragmentPagerAdapter{
 
         public MyAdapter(FragmentManager fm) {
             super(fm);
@@ -217,19 +267,25 @@ public class MainActivity extends FragmentActivity implements OnCheckedChangeLis
 
         @Override
         public Fragment getItem(int position) {
+            Fragment f = null;
             switch (position){
                 case 0:
-                    return new HomeFragment();
+                    f = new HomeFragment();
+                    break;
                 case 1:
-                    return new ZXGFragment();
+                    f = new ZXGFragment();
+                    break;
                 case 2:
-                    return new ProfitFragment();
+                    f = new ProfitFragment();
+                    break;
                 case 3:
-                    return new SettingsFragment();
+                    f = new SettingsFragment();
+                    break;
                 default:
                     break;
             }
-            return null;
+            fragments[position] = f;
+            return f;
         }
 
         @Override

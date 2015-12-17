@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical" >
 
+        <!--
         <RelativeLayout
             android:id="@+id/alert_dialog_layout_title"
             android:layout_width="wrap_content"
@@ -41,6 +42,7 @@
                 android:layout_alignParentBottom="true"
                 android:background="?android:attr/listDivider" />
         </RelativeLayout>
+        -->
 
         <RelativeLayout
             android:id="@+id/alert_dialog_layout_view"

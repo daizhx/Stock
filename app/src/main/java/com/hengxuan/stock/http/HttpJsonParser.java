@@ -18,8 +18,8 @@ public class HttpJsonParser {
             return code;
         } catch (JSONException e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 
     public String getMsg(){
@@ -37,7 +37,7 @@ public class HttpJsonParser {
             return  response.get("object");
         } catch (JSONException e) {
             e.printStackTrace();
-            return null;
         }
+        return null;
     }
 }
